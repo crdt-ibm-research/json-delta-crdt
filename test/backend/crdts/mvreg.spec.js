@@ -65,7 +65,7 @@ describe('mvreg', () => {
       const join = DotFun.join(replica1, replica2)
       expect(Array.from(MVReg.value(join)).sort()).to.deep.equal(['a', 'b'])
     })
-  }
+  })
 
   //   it('changes from one can be joined to the other', () => {
   //     deltas[0].forEach((delta) => replica2.apply(transmit(delta)))
