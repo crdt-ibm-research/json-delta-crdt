@@ -1,0 +1,20 @@
+sudo: false
+language: node_js
+branches:
+  only:
+    - master
+    - develop
+dist: xenial
+services:
+  - xvfb
+
+script:
+  - ./build.sh test
+
+addons:
+  firefox: 'latest'
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-4.8
