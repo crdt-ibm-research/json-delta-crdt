@@ -44,7 +44,7 @@ class DotFun {
     m1  = m1 || new DotFun()
     m2  = m2 || new DotFun()
     
-    assert(m1 instanceof DotFun, "left hand dotstore is not instance of DotFun")
+    assert(m1 instanceof DotFun, "left hand dotstore is not an instance of DotFun")
     assert(m2 instanceof DotFun, "right hand dotstore is not an instance of DotFun")
     assert(cc1 instanceof CausalContext, "left hand has invalid CausalContext")
     assert(cc2 instanceof CausalContext, "right hand has invalid CausalContext")
