@@ -23,7 +23,7 @@ describe('mvreg', () => {
     it('can write multiple values and keep the last - join order 1', () => {
       const mvreg = [new DotFun('mvreg'), new CausalContext()] 
       const delta_a = MVReg.write('a', [mvreg[0], mvreg[1]])
-      const after_delta = DotFun.join(mvreg, delta)
+      const after_delta = DotFun.join(mvreg, delta_a)
       const delta_b = MVReg.write('b', [after_delta[0], after_delta[1]])
       const res = DotFun.join(after_delta, delta_b)
       expect(MVReg.value(res)).to.deep.equal(new Set(['b']))
@@ -33,7 +33,7 @@ describe('mvreg', () => {
       const mvreg = [new DotFun('mvreg'), new CausalContext()] 
       const delta_a = MVReg.write('a', [mvreg[0], mvreg[1]])
       const delta_b = MVReg.write('b', [delta_a[0], delta_a[1]])
-      const res = DotFun.join(after_delta, delta_b)
+      const res = DotFun.join(mvreg, delta_b)
       expect(MVReg.value(res)).to.deep.equal(new Set(['b']))
     })
   })
