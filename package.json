@@ -1,0 +1,27 @@
+{
+  "name": "json-delta-crdt",
+  "version": "0.1.0",
+  "description": "delta based CRDTs supporting JSON data",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run test:node && npm run test:browser",
+    "test:node": "aegir test --target node",
+    "test:browser": "AEGIR_BROWSERS=Chrome,Firefox aegir test --target browser",
+    "lint": "aegir lint"
+  },
+  "author": "",
+  "license": "IBM",
+  "devDependencies": {
+    "aegir": "^18.0.3",
+    "allcombinations": "^1.1.4",
+    "chai": "^4.2.0",
+    "delay": "^4.1.0",
+    "dirty-chai": "^2.0.1",
+    "p-queue": "^3.0.0",
+    "pre-commit": "^1.2.2",
+    "shuffle-array": "^1.0.1"
+  },
+  "pre-commit": [
+    "test"
+  ]
+}
