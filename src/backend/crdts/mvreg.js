@@ -4,6 +4,8 @@ const DotFun = require('../dotstores/dot-fun')
 const CausalContext = require('../causal-context')
 
 class MVReg {
+  static typename = "mvreg"
+
   static value([m, c]) {
     const ret = new Set()
     for (let [, value] of m.items()) {
@@ -14,7 +16,7 @@ class MVReg {
 
   static write(value, [m, c]) {
     // handle undefined
-    m = m || new DotFun(m.typename)
+    m = m || new DotFun(MVReg.typename)
     const dot = c.next()
     const newState = new DotFun(m.typename).set(dot, value)
     const newCC = new CausalContext().insertDot(dot).insertDots(m.dots())
