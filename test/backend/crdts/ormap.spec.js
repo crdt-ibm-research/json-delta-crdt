@@ -16,17 +16,12 @@ const MVReg = require('../../../src/backend/crdts/mvreg')
 util.inspect.defaultOptions.depth = null
 
 describe('ormap', () => {
-
 	describe('local', () => {
-		
 		let ormap
+
 		it('type can be created', () => {
 			ormap = [new DotMap(ORMap.typename()), new CausalContext()] 
-    })
-
-//     it('can be instantiated', () => {
-//       ormap = ORMap('id1')
-//     })
+		})
 
 		it('starts empty', () => {
 			expect(ORMap.value(ormap)).to.deep.equal({})
@@ -41,7 +36,6 @@ describe('ormap', () => {
 			)
 		})
 
-
 		it('can apply a causal CRDT again', () => {
 			const sub = function ([m,cc]) {	return MVReg.write("2", [m,cc])	}
 			const delta = ORMap.apply(sub, "a", ormap)
@@ -50,7 +44,6 @@ describe('ormap', () => {
 				{"a" : new Set("2")}
 			)
 		})
-
 
 		it('can remove', () => {
 			const delta = ORMap.remove("a", ormap)
@@ -90,6 +83,12 @@ describe('ormap', () => {
 			ormap = DotMap.join(ormap, d4)
 			expect(ORMap.value(ormap)).to.deep.equal({})
 		})
+	})
+})
+
+//     it('can be instantiated', () => {
+//       ormap = ORMap('id1')
+//     })
 
 //     it('can get value', () => {
 //       expect(ormap.value()).to.deep.equal({})
@@ -102,7 +101,6 @@ describe('ormap', () => {
 //     // it('can get value', () => {
 //     //   expect(ormap.value()).to.deep.equal({ b: new Set(['B']) })
 //     // })
-   })
 
 //   describe('together', () => {
 //     let ORMap = CRDT('ormap')
@@ -181,4 +179,3 @@ describe('ormap', () => {
 //       expect(replica2.value().b).to.not.exist()
 //     })
 //   })
-})
