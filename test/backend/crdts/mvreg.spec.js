@@ -6,7 +6,6 @@ const dirtyChai = require('dirty-chai')
 const expect = chai.expect
 chai.use(dirtyChai)
 
-const transmit = require('../../../src/helpers/transmit')
 const MVReg = require('../../../src/backend/crdts/mvreg')
 const DotFun = require('../../../src/backend/dotstores/dot-fun')
 const CausalContext = require('../../../src/backend/causal-context')
@@ -38,33 +37,35 @@ describe('mvreg', () => {
     })
   })
 
-  // describe('together', () => {
-  //   let replica1, replica2
-  //   let deltas = [[], []]
-  //   before(() => {
-  //     replica1 = new MVReg('id1')
-  //     replica2 = new MVReg('id2')
-  //   })
-  // }
+  describe('two replicas', () => {
+    let replica1, replica2
+    let deltas = [[], []]
 
-  //   it('values can be written concurrently', () => {
-  //     deltas[0].push(replica1.write('hello'))
-  //     deltas[0].push(replica1.write('world'))
-  //     deltas[1].push(replica2.write('world'))
-  //     deltas[1].push(replica2.write('hello'))
-  //   })
+    before(() => {
+      replica1 = [new DotFun('mvreg'), new CausalContext()]
+      replica2 = [new DotFun('mvreg'), new CausalContext()]
+    })
 
-  //   it('has local values', () => {
-  //     expect(Array.from(replica1.value()).sort()).to.deep.equal(['world'])
-  //     expect(Array.from(replica2.value()).sort()).to.deep.equal(['hello'])
-  //   })
+    it('values can be written concurrently', () => {
+      deltas[0].push(MVReg.write('a', [replica1[0], replica1[1]]))
+      deltas[0].push(MVReg.write('b', [deltas[0][0], deltas[0][1]]))
+      replica1 = DotFun.join(mvreg, deltas[0].reduce(DotFun.join))
+      
+      deltas[1].push(MVReg.write('b', [replica1[0], replica1[1]]))
+      deltas[1].push(MVReg.write('a', [deltas[0][0], deltas[0][1]]))
+      replica2 = DotFun.join(mvreg, deltas[1].reduce(DotFun.join))
+    })
 
-  //   it('changes can be raw joined', () => {
-  //     const state = new MVReg('joiner').join(transmit(replica1.state()), transmit(replica2.state()))
-  //     const replica = new MVReg('replica')
-  //     replica.apply(state)
-  //     expect(Array.from(replica.value()).sort()).to.deep.equal(['hello', 'world'])
-  //   })
+    it('has local values', () => {
+      expect(MVReg.value(replica1)).to.deep.equal(new Set(['b']))
+      expect(MVReg.value(replica1)).to.deep.equal(new Set(['a']))
+    })
+
+    it('changes can be raw joined', () => {
+      const join = DotFun.join(replica1, replica2)
+      expect(Array.from(MVReg.value(join)).sort()).to.deep.equal(['a', 'b'])
+    })
+  }
 
   //   it('changes from one can be joined to the other', () => {
   //     deltas[0].forEach((delta) => replica2.apply(transmit(delta)))
