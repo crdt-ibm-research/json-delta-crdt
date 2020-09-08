@@ -45,7 +45,7 @@ class DotFun {
     assert(cc1 instanceof CausalContext, "left hand has invalid CausalContext")
     assert(cc2 instanceof CausalContext, "right hand has invalid CausalContext")
     // TODO: do we want to enforce type
-    assert(m1.typename === m2.typename, `join of DotMap must be between same types got ${s1.dotstore.typename} and ${s2.dotstore.typename}`)
+    assert(m1.typename === m2.typename, `join of DotMap must be between same types got ${m1.typename} and ${m2.typename}`)
 
     const allDots = new Set([...m1.state.keys(), ...m2.state.keys()])
     const resultDotStore = new DotFun(m1.typename)
