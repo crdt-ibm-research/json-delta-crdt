@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "npm run test:node",
-    "test:node": "aegir test --target node",
+    "test:node": "nyc -s aegir test -t node && npx nyc report",
     "test:browser": "AEGIR_BROWSERS=Chrome,Firefox aegir test --target browser",
     "lint": "aegir lint"
   },

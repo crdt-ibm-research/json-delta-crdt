@@ -19,7 +19,7 @@ jobs:
     - stage: check
       script:
         - npx aegir dep-check
-        - npx nyc report
+        - npx nyc -s aegir test -t node && npx nyc report
         # - npm run lint
 
     - stage: test
