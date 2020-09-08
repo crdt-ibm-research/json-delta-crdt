@@ -5,15 +5,16 @@ const CustomSet = require('./custom-set')
 // Autonomous causal context, for context sharing in maps
 // Methods of CausalContext mutate its own state
 class CausalContext {
-  constructor() {
+  constructor(id) {
     this._cc = new Map() // compact causal context {ID->INT}
     this._dc = new CustomSet() // dot cloud SET([id,int], ...)
+    this._id = id || undefined // todo: uuid
   }
 
   static from(other) {
-    // if (!(other instanceof CausalContext)) {
-    //   throw new Error('expected CausalContext')
-    // }
+    if (!(other instanceof CausalContext)) {
+      throw new Error('expected CausalContext')
+    }
     const result = new CausalContext()
     result._cc = new Map([...other._cc])
     result._dc = CustomSet.from(other._dc)
@@ -60,16 +61,16 @@ class CausalContext {
     return this
   }
 
-  _next(id) {
-    const value = this._cc.get(id) || 0
+  _next() {
+    const value = this._cc.get(this.id) || 0
     const newValue = value + 1
-    return [id, newValue]
+    return [this._id, newValue]
   }
 
-  makeDot(id) {
+  makeDot() {
     // On a valid dot generator, all dots should be compact on the used id
     // Making the new dot, updates the dot generator and returns the dot
-    const n = this._next(id)
+    const n = this._next(this._id)
     this._cc.set(n[0], n[1])
     return n
   }
