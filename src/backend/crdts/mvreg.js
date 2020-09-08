@@ -14,7 +14,7 @@ class MVReg {
 
   static write(value, [m, c]) {
     // change to next
-    const dot = c.makeDot()
+    const dot = c.next()
     const newState = new DotFun(m.typename).set(dot, value)
     const newCC = new CausalContext().insertDot(dot).insertDots(m.dots())
     return [newState, newCC]

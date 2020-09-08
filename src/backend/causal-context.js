@@ -62,7 +62,7 @@ class CausalContext {
     return this
   }
 
-  _next() {
+  next() {
     const value = this._cc.get(this._id) || 0
     const newValue = value + 1
     return [this._id, newValue]
@@ -71,7 +71,7 @@ class CausalContext {
   makeDot() {
     // On a valid dot generator, all dots should be compact on the used id
     // Making the new dot, updates the dot generator and returns the dot
-    const n = this._next(this._id)
+    const n = this.next(this._id)
     this._cc.set(n[0], n[1])
     return n
   }
