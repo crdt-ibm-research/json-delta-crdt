@@ -8,7 +8,6 @@ branches:
     - develop
 node_js:
   - node
-  - 'lts/*'
 
 stages:
   - check
@@ -20,6 +19,7 @@ jobs:
     - stage: check
       script:
         - npx aegir dep-check
+        - npx nyc report
         # - npm run lint
 
     - stage: test
@@ -37,19 +37,5 @@ jobs:
       addons:
         firefox: latest
       script: npx aegir test -t browser -t webworker -- --browsers FirefoxHeadless
-    
-    - stage: test
-      name: electron-main
-      os: osx
-      script:
-        - npx aegir test -t electron-main --bail
-    
-    - stage: test
-      name: electron-renderer
-      os: osx
-      script:
-        - npx aegir test -t electron-renderer --bail
-
-after_success: npx nyc report --reporter=text-lcov > coverage.lcov && npx codecov
     
 cache: npm
