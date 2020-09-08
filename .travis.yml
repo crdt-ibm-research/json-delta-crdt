@@ -1,16 +1,18 @@
+---
 sudo: false
+dist: xenial
 language: node_js
 branches:
   only:
     - master
     - develop
-dist: xenial
+install:
+  # Travis defaults to running "npm install" instead of "npm ci"
+  - npm ci
 services:
   - xvfb
-
 script:
   - ./build.sh test
-
 addons:
   firefox: 'latest'
   apt:
@@ -18,7 +20,6 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - g++-4.8
-
 cache:
   directories:
     - /home/travis/.npm
