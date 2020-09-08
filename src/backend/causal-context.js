@@ -90,7 +90,7 @@ class CausalContext {
   }
 
   join(other) {
-    if (this === other) return this; // Join is idempotent, but just dont do it.
+    if (this === other) return this // Join is idempotent, but just dont do it.
 
     if (!(other instanceof CausalContext)) {
       other = CausalContext.from(other)

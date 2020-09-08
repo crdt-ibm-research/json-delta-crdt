@@ -9,13 +9,47 @@ branches:
 node_js:
   - node
   - 'lts/*'
-addons:
-  firefox: 'latest'
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-    packages:
-      - g++-4.8
-cache:
-  directories:
-    - "$HOME/.npm"
+
+stages:
+  - check
+  - test
+  - cov
+
+jobs:
+  include:
+    - stage: check
+      script:
+        - npx aegir dep-check
+        # - npm run lint
+
+    - stage: test
+      name: node
+      script: npx aegir test -t node
+    
+    - stage: test
+      name: chrome
+      addons:
+        chrome: stable
+      script: npx aegir test -t browser -t webworker
+
+    - stage: test
+      name: firefox
+      addons:
+        firefox: latest
+      script: npx aegir test -t browser -t webworker -- --browsers FirefoxHeadless
+    
+    - stage: test
+      name: electron-main
+      os: osx
+      script:
+        - npx aegir test -t electron-main --bail
+    
+    - stage: test
+      name: electron-renderer
+      os: osx
+      script:
+        - npx aegir test -t electron-renderer --bail
+
+after_success: npx nyc report --reporter=text-lcov > coverage.lcov && npx codecov
+    
+cache: npm

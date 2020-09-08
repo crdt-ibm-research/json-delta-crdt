@@ -6,7 +6,7 @@ module.exports = class CustomSet {
   }
 
   static from(base) {
-    const result =  new CustomSet()
+    const result = new CustomSet()
     result._refs = new Map([...base._refs])
     return result
   }

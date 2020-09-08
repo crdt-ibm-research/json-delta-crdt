@@ -4,7 +4,7 @@
   "description": "delta based CRDTs supporting JSON data",
   "main": "index.js",
   "scripts": {
-    "test": "npm run test:node && npm run test:browser",
+    "test": "npm run test:node",
     "test:node": "aegir test --target node",
     "test:browser": "AEGIR_BROWSERS=Chrome,Firefox aegir test --target browser",
     "lint": "aegir lint"
