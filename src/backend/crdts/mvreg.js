@@ -13,6 +13,8 @@ class MVReg {
   }
 
   static write(value, [m, c]) {
+    // handle undefined
+    m = m || new DotFun(m.typename)
     const dot = c.next()
     const newState = new DotFun(m.typename).set(dot, value)
     const newCC = new CausalContext().insertDot(dot).insertDots(m.dots())
