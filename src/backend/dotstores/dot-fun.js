@@ -40,15 +40,17 @@ class DotFun {
 
   // join does not affect state, returns delta
   static join ([m1, cc1], [m2, cc2]) {
+    // handle undefined
+    m1  = m1 || new DotFun()
+    m2  = m2 || new DotFun()
+    
     assert(m1 instanceof DotFun, "left hand dotstore is not instance of DotFun")
     assert(m2 instanceof DotFun, "right hand dotstore is not an instance of DotFun")
     assert(cc1 instanceof CausalContext, "left hand has invalid CausalContext")
     assert(cc2 instanceof CausalContext, "right hand has invalid CausalContext")
-    // TODO: do we want to enforce type
-    assert(m1.typename === m2.typename, `join of DotMap must be between same types got ${m1.typename} and ${m2.typename}`)
 
     const allDots = new Set([...m1.state.keys(), ...m2.state.keys()])
-    const resultDotStore = new DotFun(m1.typename)
+    const resultDotStore = new DotFun(m1.typename || m2.typename)
     // NOTE: Assuming all keys are dots
     for (const dot of allDots) {
       if (m1.has(dot) && m2.has(dot)) {
