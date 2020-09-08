@@ -17,7 +17,7 @@ describe('mvreg', () => {
       const mvreg = [new DotFun('mvreg'), new CausalContext()] 
       const delta = MVReg.write('a', [mvreg[0], mvreg[1]])
       const res = DotFun.join(mvreg, delta)
-      expect(MVReg.value(res)).to.equal(['a'])
+      expect(MVReg.value(res)).to.deep.equal(new Set(['a']))
     })
 
     // it('and the value is inserted', () => {
