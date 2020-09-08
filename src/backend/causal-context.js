@@ -1,6 +1,7 @@
 'use strict'
 
 const CustomSet = require('./custom-set')
+const uuid = require('./uuid')
 
 // Autonomous causal context, for context sharing in maps
 // Methods of CausalContext mutate its own state
@@ -8,7 +9,7 @@ class CausalContext {
   constructor(id) {
     this._cc = new Map() // compact causal context {ID->INT}
     this._dc = new CustomSet() // dot cloud SET([id,int], ...)
-    this._id = id || undefined // todo: uuid
+    this._id = id || uuid()
   }
 
   static from(other) {
@@ -62,7 +63,7 @@ class CausalContext {
   }
 
   _next() {
-    const value = this._cc.get(this.id) || 0
+    const value = this._cc.get(this._id) || 0
     const newValue = value + 1
     return [this._id, newValue]
   }

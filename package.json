@@ -22,7 +22,8 @@
     "shuffle-array": "^1.0.1"
   },
   "dependencies": {
-    "delta-crdts-msgpack-codec": "~0.2.0"
+    "delta-crdts-msgpack-codec": "~0.2.0",
+    "uuid": "^3.4.0"
   },
   "pre-commit": [
     "test"
