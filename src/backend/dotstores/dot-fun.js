@@ -5,7 +5,7 @@ const assert = require('assert');
 
 class DotFun {
   constructor (typename, state) {
-    this.typename = typename || "none"
+    this.typename = typename
     this.state = state || new Map() // {Dot-as-string -> Value}
   }
 
