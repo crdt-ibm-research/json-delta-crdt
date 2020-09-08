@@ -1,9 +1,10 @@
 'use strict'
 
+const { assert } = require('chai')
+
 const DotMap = require('../dotstores/dot-map')
 const DotFun = require('../dotstores/dot-fun')
 const CausalContext = require('../causal-context')
-const { assert } = require('chai')
 const MVReg = require('./mvreg')
 
 class ORMap {
