@@ -33,13 +33,15 @@ class ORMap {
     }
 
     static create([m,cc]) {
+        m = m || new DotMap(ORMap.typename)
+
         assert(m instanceof DotMap)
         assert(cc instanceof CausalContext)
 
         // TODO: Add DotFun with key _alive_
         const nextDot = cc.next()
         const dotFun = new DotFun().set(nextDot, true)
-        const retDotMap = new DotMap(ORMap.typename, new Map({"_alive" : dotFun}))
+        const retDotMap = new DotMap(ORMap.typename, new Map().set("_alive",dotFun))
         const retCC = new CausalContext().insertDot(nextDot)
         return [retDotMap, retCC]
     }
@@ -65,10 +67,12 @@ class ORMap {
     static remove(k, [m,cc]) {
         assert(m instanceof DotMap)
         assert(cc instanceof CausalContext)
-        return [new DotMap(ORMap.typename), m.get(k).dots()]
+
+        const retCC = new CausalContext().insertDots(m.get(k).dots())
+        return [new DotMap(ORMap.typename), retCC]
     }
 
-    static clear([m,cc]) {
+    static clear([m,cc]) {        
         assert(m instanceof DotMap)
         assert(cc instanceof CausalContext)
 
@@ -76,7 +80,7 @@ class ORMap {
 
         const nextDot = cc.next()
         const dotFun = new DotFun().set(nextDot, true)
-        const retDotMap = new DotMap(ORMap.typename, new Map({"_alive" : dotFun}))
+        const retDotMap = new DotMap(ORMap.typename, new Map().set("_alive",dotFun))
         const retCC = new CausalContext().insertDot(nextDot).insertDots(m.dots())
 
         return [retDotMap, retCC]

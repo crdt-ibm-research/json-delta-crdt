@@ -38,24 +38,58 @@ describe('ormap', () => {
 			ormap = DotMap.join(ormap, delta)
 			expect(ORMap.value(ormap)).to.deep.equal(
 				{"a" : new Set("1")}
-				)
+			)
 		})
 
-//     it('can get value', () => {
-//       expect(ormap.value()).to.deep.equal({ a: 2 })
-//     })
 
-//     it('can apply a causal CRDT again', () => {
-//       ormap.applySub('a', 'ccounter', 'inc')
-//     })
+		it('can apply a causal CRDT again', () => {
+			const sub = function ([m,cc]) {	return MVReg.write("2", [m,cc])	}
+			const delta = ORMap.apply(sub, "a", ormap)
+			ormap = DotMap.join(ormap, delta)
+			expect(ORMap.value(ormap)).to.deep.equal(
+				{"a" : new Set("2")}
+			)
+		})
 
-//     it('can get value', () => {
-//       expect(ormap.value()).to.deep.equal({ a: 3 })
-//     })
 
-//     it('can remove', () => {
-//       ormap.remove('a')
-//     })
+		it('can remove', () => {
+			const delta = ORMap.remove("a", ormap)
+			ormap = DotMap.join(ormap, delta)
+			expect(ORMap.value(ormap)).to.deep.equal({})
+		})
+
+		it('can embed another ormap', () => {
+			const sub = ORMap.create
+			const delta = ORMap.apply(sub, "a", ormap)
+			ormap = DotMap.join(ormap, delta)
+			expect(ORMap.value(ormap)).to.deep.equal({ "a" : {}})
+
+			const write1 = function ([m,cc]) {	return MVReg.write("1", [m,cc])	}
+			const write2 = function ([m,cc]) {	return MVReg.write("2", [m,cc])	}
+			const sub1 = function([m,cc]) { return ORMap.apply(write1, "a", [m,cc])}
+			const sub2 = function([m,cc]) { return ORMap.apply(write2, "b", [m,cc])}
+
+			const d1 = ORMap.apply(sub1, "a", ormap)
+			ormap = DotMap.join(ormap, d1)
+			const d2 = ORMap.apply(sub2, "a", ormap)
+			ormap = DotMap.join(ormap, d2)
+
+			expect(ORMap.value(ormap)).to.deep.equal(
+				{"a" : {
+					"a" : new Set(["1"]),
+					"b" : new Set(["2"]),
+				}
+			})
+
+			const clear = ORMap.clear
+			const d3 = ORMap.apply(clear, "a", ormap)
+			ormap = DotMap.join(ormap, d3)
+			expect(ORMap.value(ormap)).to.deep.equal({ "a" : {}})
+
+			const d4 = ORMap.remove("a", ormap)
+			ormap = DotMap.join(ormap, d4)
+			expect(ORMap.value(ormap)).to.deep.equal({})
+		})
 
 //     it('can get value', () => {
 //       expect(ormap.value()).to.deep.equal({})
