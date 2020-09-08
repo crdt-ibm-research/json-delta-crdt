@@ -12,7 +12,6 @@
   "author": "",
   "license": "IBM",
   "devDependencies": {
-    "@babel/plugin-proposal-class-properties": "^7.10.4",
     "aegir": "^18.0.3",
     "allcombinations": "^1.1.4",
     "chai": "^4.2.0",

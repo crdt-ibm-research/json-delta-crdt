@@ -48,17 +48,17 @@ describe('mvreg', () => {
 
     it('values can be written concurrently', () => {
       deltas[0].push(MVReg.write('a', [replica1[0], replica1[1]]))
-      deltas[0].push(MVReg.write('b', [deltas[0][0], deltas[0][1]]))
-      replica1 = DotFun.join(mvreg, deltas[0].reduce(DotFun.join))
+      deltas[0].push(MVReg.write('b', deltas[0][0]))
+      replica1 = DotFun.join(replica1, deltas[0].reduce(DotFun.join))
       
-      deltas[1].push(MVReg.write('b', [replica1[0], replica1[1]]))
-      deltas[1].push(MVReg.write('a', [deltas[0][0], deltas[0][1]]))
-      replica2 = DotFun.join(mvreg, deltas[1].reduce(DotFun.join))
+      deltas[1].push(MVReg.write('b', [replica2[0], replica2[1]]))
+      deltas[1].push(MVReg.write('a', deltas[1][0]))
+      replica2 = DotFun.join(replica2, deltas[1].reduce(DotFun.join))
     })
 
     it('has local values', () => {
       expect(MVReg.value(replica1)).to.deep.equal(new Set(['b']))
-      expect(MVReg.value(replica1)).to.deep.equal(new Set(['a']))
+      expect(MVReg.value(replica2)).to.deep.equal(new Set(['a']))
     })
 
     it('changes can be raw joined', () => {

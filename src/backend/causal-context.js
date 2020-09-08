@@ -2,6 +2,7 @@
 
 const CustomSet = require('./custom-set')
 const uuid = require('./uuid')
+const { assert } = require('chai');
 
 // Autonomous causal context, for context sharing in maps
 // Methods of CausalContext mutate its own state
@@ -16,7 +17,7 @@ class CausalContext {
     if (!(other instanceof CausalContext)) {
       throw new Error('expected CausalContext')
     }
-    const result = new CausalContext()
+    const result = new CausalContext(other._id)
     result._cc = new Map([...other._cc])
     result._dc = CustomSet.from(other._dc)
     return result
@@ -62,6 +63,10 @@ class CausalContext {
     return this
   }
 
+  getID() {
+    return this._id
+  }
+
   next() {
     const value = this._cc.get(this._id) || 0
     const newValue = value + 1
@@ -92,11 +97,8 @@ class CausalContext {
   }
 
   join(other) {
+    assert(other instanceof CausalContext, "join should receive a causal context")
     if (this === other) return this // Join is idempotent, but just dont do it.
-
-    if (!(other instanceof CausalContext)) {
-      other = CausalContext.from(other)
-    }
 
     const allKeys = new Set([...this._cc.keys(), ...other._cc.keys()])
     for (let key of allKeys) {

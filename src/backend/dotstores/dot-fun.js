@@ -38,7 +38,7 @@ class DotFun {
     return this
   }
 
-  // join does not affect state, returns delta
+  // join does not affect state, , returns delta
   static join ([m1, cc1], [m2, cc2]) {
     // handle undefined
     m1  = m1 || new DotFun()

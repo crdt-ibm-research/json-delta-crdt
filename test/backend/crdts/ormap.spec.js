@@ -21,7 +21,7 @@ describe('ormap', () => {
 		
 		let ormap
 		it('type can be created', () => {
-			ormap = [new DotMap(ORMap.typename), new CausalContext()] 
+			ormap = [new DotMap(ORMap.typename()), new CausalContext()] 
     })
 
 //     it('can be instantiated', () => {
