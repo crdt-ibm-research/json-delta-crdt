@@ -10,10 +10,7 @@ chai.use(dirtyChai)
 const DotMap = require('../../../src/backend/dotstores/dot-map')
 const ORMap = require('../../../src/backend/crdts/ormap')
 const CausalContext = require('../../../src/backend/causal-context')
-
-const util = require('util')
 const MVReg = require('../../../src/backend/crdts/mvreg')
-util.inspect.defaultOptions.depth = null
 
 describe('ormap', () => {
 	describe('local', () => {
