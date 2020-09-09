@@ -27,6 +27,7 @@ describe('ormap', () => {
 		it('can apply a causal CRDT', () => {
 			const sub = function ([m,cc]) {	return MVReg.write("1", [m,cc])	}
 			const delta = ORMap.apply(sub, "a", ormap)
+
 			ormap = DotMap.join(ormap, delta)
 			expect(ORMap.value(ormap)).to.deep.equal(
 				{"a" : new Set("1")}
@@ -54,13 +55,15 @@ describe('ormap', () => {
 			ormap = DotMap.join(ormap, delta)
 			expect(ORMap.value(ormap)).to.deep.equal({ "a" : {}})
 
+			// doc.a.a = 1
 			const write1 = function ([m,cc]) {	return MVReg.write("1", [m,cc])	}
-			const write2 = function ([m,cc]) {	return MVReg.write("2", [m,cc])	}
 			const sub1 = function([m,cc]) { return ORMap.apply(write1, "a", [m,cc])}
-			const sub2 = function([m,cc]) { return ORMap.apply(write2, "b", [m,cc])}
-
 			const d1 = ORMap.apply(sub1, "a", ormap)
 			ormap = DotMap.join(ormap, d1)
+
+			//doc.a.b = 1
+			const write2 = function ([m,cc]) {	return MVReg.write("2", [m,cc])	}
+			const sub2 = function([m,cc]) { return ORMap.apply(write2, "b", [m,cc])}
 			const d2 = ORMap.apply(sub2, "a", ormap)
 			ormap = DotMap.join(ormap, d2)
 
@@ -128,22 +131,43 @@ describe('together', () => {
 //         c: new Set(['c', 'C']) })
 //     })
 
-	// it('the first converges', () => {
-	// 	deltas[1].forEach((delta) => replica1.apply(transmit(delta)))
-	// 	expect(replica1.value()).to.deep.equal({
-	// 		a: new Set(['a', 'A']),
-	// 		b: new Set(['b', 'B']),
-	// 		c: new Set(['c', 'C'])
+	it('the first converges', () => {
+		deltas[1].forEach((delta) => replica1 = DotMap.join(replica1, delta))
+		expect(ORMap.value(replica1)).to.deep.equal({
+			a : new Set(["1"]),
+			A : new Set(["2"]),
+			both : new Set(["1", "2"])
+		})
+	})
+
+	it('the second converges', () => {
+		deltas[0].forEach((delta) => replica2 = DotMap.join(replica2, delta))
+		expect(ORMap.value(replica2)).to.deep.equal({
+			a : new Set(["1"]),
+			A : new Set(["2"]),
+			both : new Set(["1", "2"])
+		})
+	})
+
+	
+	// it('obeys OR semantics', () => {
+	// 	const sub = function ([m,cc]) {	return MVReg.write("3", [m,cc])	}
+	// 	const writeDelta = ORMap.apply(sub, "a", replica1)
+
+	// 	const removeDelta = ORMap.remove("a", replica2)
+	// 	expect(ORMap.value(replica2)).to.deep.equal({
+	// 		A : new Set(["2"]),
+	// 		both : new Set(["1", "2"])
+	// 	})
+
+	// 	replica2 = DotMap.join(replica2, writeDelta)
+	// 	expect(ORMap.value(replica2)).to.deep.equal({
+	// 		a : new Set(["3"]),
+	// 		A : new Set(["2"]),
+	// 		both : new Set(["1", "2"])
 	// 	})
 	// })
 
-  //    it('the second converges', () => {
-  //      deltas[0].forEach((delta) => replica2.apply(transmit(delta)))
-  //      expect(replica2.value()).to.deep.equal({
-  //        a: new Set(['a', 'A']),
-  //        b: new Set(['b', 'B']),
-  //        c: new Set(['c', 'C']) })
-  //    })
 
 //     it('keeps causality', () => {
 //       const delta = replica1.applySub('a', 'mvreg', 'write', 'AA')
