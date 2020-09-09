@@ -1,8 +1,8 @@
 'use strict'
 
 const uuid = require('./uuid')
-const ORMap = require('../../../src/backend/crdts/ormap')
-const CausalContext = require('../../../src/backend/causal-context')
+const ORMap = require('./crdts/ormap')
+const CausalContext = require('./crdts/causal-context')
 
 class Backend {
     constructor(id, state) {
