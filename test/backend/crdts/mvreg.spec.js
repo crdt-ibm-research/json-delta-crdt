@@ -76,31 +76,4 @@ describe('mvreg', () => {
       expect(MVReg.value(join)).to.equal('b')
     })
   })
-
-  //   it('changes from one can be joined to the other', () => {
-  //     deltas[0].forEach((delta) => replica2.apply(transmit(delta)))
-  //   })
-
-  //   it('and vice versa', () => {
-  //     deltas[1].forEach((delta) => replica1.apply(transmit(delta)))
-  //   })
-
-  //   it('the first converges', () => {
-  //     expect(Array.from(replica1.value()).sort()).to.deep.equal(['hello', 'world'])
-  //   })
-
-  //   it('and the second also converges', () => {
-  //     expect(Array.from(replica2.value()).sort()).to.deep.equal(['hello', 'world'])
-  //   })
-
-  //   it('binary ids also converge', () => {
-  //     const replicaA = MVReg(Buffer.from('idA'))
-  //     const deltaA = replicaA.write('a')
-  //     const replicaB = MVReg(Buffer.from('idB'))
-  //     replicaB.apply(deltaA)
-  //     const deltaB = replicaB.write('b')
-  //     replicaA.apply(deltaB)
-  //     expect(Array.from(replicaA.value()).sort()).to.deep.equal(['b'])
-  //   })
-  // })
 })
