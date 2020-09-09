@@ -3,7 +3,6 @@
 const { assert } = require('chai')
 
 const DotMap = require('../dotstores/dot-map')
-const DotFun = require('../dotstores/dot-fun')
 const CausalContext = require('../causal-context')
 const MVReg = require('./mvreg')
 const { ALIVE, MAP, ARRAY, VALUE } = require('../constants')
