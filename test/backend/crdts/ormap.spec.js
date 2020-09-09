@@ -11,6 +11,7 @@ const DotMap = require('../../../src/backend/dotstores/dot-map')
 const ORMap = require('../../../src/backend/crdts/ormap')
 const CausalContext = require('../../../src/backend/causal-context')
 const MVReg = require('../../../src/backend/crdts/mvreg')
+const { VALUE } = require('../../../src/backend/constants')
 
 describe('ormap', () => {
 	describe('local', () => {
@@ -179,17 +180,54 @@ describe('together', () => {
 			a : new Set(["3"]),
 			A : new Set(["2"]),
 			both : new Set(["3"])
-			})
+		})
 	})
 
 	it('can have a datatype conflict', () => {
 		var sub = ORMap.create
 		const d1 = ORMap.applyToMap(sub, "conflict", replica1)
 		replica1 = DotMap.join(replica1, d1)
+		expect(ORMap.value(replica1)).to.deep.equal({
+			a : new Set(["3"]),
+			both : new Set(["3"]),
+			A : new Set(["2"]),
+			conflict : {}
+		})
 
 		sub = function ([m,cc]) { return MVReg.write("1", [m,cc]) }
-		const d2 = ORMap.applyToMap(sub, "conflict", replica2)
+		const d2 = ORMap.applyToValue(sub, "conflict", replica2)
 		replica2 = DotMap.join(replica2, d2)
+		expect(ORMap.value(replica2)).to.deep.equal({
+			a : new Set(["3"]),
+			A : new Set(["2"]),
+			both : new Set(["3"]),
+			conflict : new Set(["1"])
+		})
 
+		replica2 = DotMap.join(replica2, d1)
+		replica1 = DotMap.join(replica1, d1)
+		expect(ORMap.value(replica1)).to.deep.equal(ORMap.value(replica2))
+		expect(ORMap.value(replica1)).to.deep.equal({
+			a : new Set(["3"]),
+			both : new Set(["3"]),
+			A : new Set(["2"]),
+			conflict : {}
+		})
+
+		// Type conflict handler expects this to be defined
+		expect(replica2[0].state.get("conflict").has(VALUE)).to.equal(true)
+	})
+
+	it('can resolve a datatype conflict', () => {
+		const sub = function ([m,cc]) { return MVReg.write("1", [m,cc]) }
+		const d3 = ORMap.applyToValue(sub, "conflict", replica2)
+		replica2 = DotMap.join(replica2, d3)
+		replica1 = DotMap.join(replica1, d3)
+		expect(ORMap.value(replica2)).to.deep.equal({
+			a : new Set(["3"]),
+			A : new Set(["2"]),
+			both : new Set(["3"]),
+			conflict : new Set(["1"])
+		})
 	})
 })
