@@ -11,8 +11,12 @@ const CausalContext = require('../../src/backend/causal-context')
 describe('causal-context', () => {
   let cc
 
-  it('can create', () => {
+  it('can create causal context without an id', () => {
     cc = new CausalContext()
+  })
+  
+  it('can create causal context with given id', () => {
+    cc = new CausalContext("a")
   })
 
   it('dot is not in', () => {
@@ -20,7 +24,7 @@ describe('causal-context', () => {
   })
 
   it('can make dot', () => {
-    cc.makeDot('a')
+    cc.makeDot()
   })
 
   it('dot is in', () => {
@@ -62,7 +66,7 @@ describe('causal-context', () => {
     let result
 
     before(() => {
-      other = new CausalContext()
+      other = new CausalContext("b")
       other.insertDot(['a', 1])
       other.insertDot(['b', 2])
     })
