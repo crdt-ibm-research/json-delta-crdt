@@ -5,7 +5,7 @@ const { assert } = require('chai')
 const DotMap = require('../dotstores/dot-map')
 const CausalContext = require('../causal-context')
 const MVReg = require('./mvreg')
-const { ALIVE } = require('../constants')
+const { ALIVE, MAP, ARRAY, VALUE } = require('../constants')
 
 class ORMap {
     static typename() {
@@ -18,16 +18,13 @@ class ORMap {
         let retMap = {}
         for (let [key, value] of m.state.entries()) {
             if (key === ALIVE) continue
-            const type = m.get(key).typename
-            switch (type) {
-                case ORMap.typename():
-                    value = ORMap.value([m.get(key), cc])
-                    break;
-                case MVReg.typename():
-                    value = MVReg.values([m.get(key), cc])
-                    break;
-                default:
-                    break;
+            const innerMap = m.get(key)
+            if (innerMap.has(MAP)) {
+                value = ORMap.value([innerMap.get(MAP), cc])
+            } else if (innerMap.has(ARRAY)) {
+                value = ORArray.values([innerMap.get(ARRAY), cc])
+            } else {
+                value = MVReg.values([innerMap.get(VALUE), cc])
             }
 
             retMap[key] = value
@@ -46,6 +43,24 @@ class ORMap {
         const retDotMap = new DotMap(ORMap.typename(), new Map().set(ALIVE, retFun))
 
         return [retDotMap, retCC]
+    }
+
+    static applyToMap(o, k, [m,cc]) {
+        // TODO: Delete other two
+        const inner = function ([m,cc]) {return ORMap.apply(o, MAP, [m, cc])}
+        return ORMap.apply(inner, k, [m,cc])
+    }
+
+    static applyToArray(o, k, [m,cc]) {
+        // TODO: Delete other two
+        const inner = function ([m,cc]) {return ORMap.apply(o, ARRAY, [m, cc])}
+        return ORMap.apply(inner, k, [m,cc])
+    }
+
+    static applyToValue(o, k, [m,cc]) {
+        // TODO: Delete other two
+        const inner = function ([m,cc]) {return ORMap.apply(o, VALUE, [m, cc])}
+        return ORMap.apply(inner, k, [m,cc])
     }
 
     static apply(o, k, [m,cc]) {

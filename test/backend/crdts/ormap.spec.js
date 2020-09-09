@@ -26,7 +26,7 @@ describe('ormap', () => {
 
 		it('can apply a causal CRDT', () => {
 			const sub = function ([m,cc]) {	return MVReg.write("1", [m,cc])	}
-			const delta = ORMap.apply(sub, "a", ormap)
+			const delta = ORMap.applyToValue(sub, "a", ormap)
 
 			ormap = DotMap.join(ormap, delta)
 			expect(ORMap.value(ormap)).to.deep.equal(
@@ -36,7 +36,7 @@ describe('ormap', () => {
 
 		it('can apply a causal CRDT again', () => {
 			const sub = function ([m,cc]) {	return MVReg.write("2", [m,cc])	}
-			const delta = ORMap.apply(sub, "a", ormap)
+			const delta = ORMap.applyToValue(sub, "a", ormap)
 			ormap = DotMap.join(ormap, delta)
 			expect(ORMap.value(ormap)).to.deep.equal(
 				{"a" : new Set("2")}
@@ -51,20 +51,20 @@ describe('ormap', () => {
 
 		it('can embed another ormap', () => {
 			const sub = ORMap.create
-			const delta = ORMap.apply(sub, "a", ormap)
+			const delta = ORMap.applyToMap(sub, "a", ormap)
 			ormap = DotMap.join(ormap, delta)
 			expect(ORMap.value(ormap)).to.deep.equal({ "a" : {}})
 
 			// doc.a.a = 1
 			const write1 = function ([m,cc]) {	return MVReg.write("1", [m,cc])	}
-			const sub1 = function([m,cc]) { return ORMap.apply(write1, "a", [m,cc])}
-			const d1 = ORMap.apply(sub1, "a", ormap)
+			const sub1 = function([m,cc]) { return ORMap.applyToValue(write1, "a", [m,cc])}
+			const d1 = ORMap.applyToMap(sub1, "a", ormap)
 			ormap = DotMap.join(ormap, d1)
 
 			//doc.a.b = 1
 			const write2 = function ([m,cc]) {	return MVReg.write("2", [m,cc])	}
-			const sub2 = function([m,cc]) { return ORMap.apply(write2, "b", [m,cc])}
-			const d2 = ORMap.apply(sub2, "a", ormap)
+			const sub2 = function([m,cc]) { return ORMap.applyToValue(write2, "b", [m,cc])}
+			const d2 = ORMap.applyToMap(sub2, "a", ormap)
 			ormap = DotMap.join(ormap, d2)
 
 			expect(ORMap.value(ormap)).to.deep.equal(
@@ -75,7 +75,7 @@ describe('ormap', () => {
 			})
 
 			const clear = ORMap.clear
-			const d3 = ORMap.apply(clear, "a", ormap)
+			const d3 = ORMap.applyToMap(clear, "a", ormap)
 			ormap = DotMap.join(ormap, d3)
 			expect(ORMap.value(ormap)).to.deep.equal({ "a" : {}})
 
@@ -96,16 +96,16 @@ describe('together', () => {
 	})
 
 	it('values can be written concurrently', () => {
-		const sub1 = function ([m,cc]) {	return MVReg.write("1", [m,cc])	}
-		deltas[0].push(ORMap.apply(sub1, "a", replica1))
+		const sub1 = function ([m,cc]) { return MVReg.write("1", [m,cc]) }
+		deltas[0].push(ORMap.applyToValue(sub1, "a", replica1))
 		replica1 = DotMap.join(replica1, deltas[0][0])
-		deltas[0].push(ORMap.apply(sub1, "both", replica1))
+		deltas[0].push(ORMap.applyToValue(sub1, "both", replica1))
 		replica1 = DotMap.join(replica1, deltas[0][1])
 
-		const sub2 = function ([m,cc]) {	return MVReg.write("2", [m,cc])	}
-		deltas[1].push(ORMap.apply(sub2, "A", replica2))
+		const sub2 = function ([m,cc]) { return MVReg.write("2", [m,cc]) }
+		deltas[1].push(ORMap.applyToValue(sub2, "A", replica2))
 		replica2 = DotMap.join(replica2, deltas[1][0])
-		deltas[1].push(ORMap.apply(sub2, "both", replica2))
+		deltas[1].push(ORMap.applyToValue(sub2, "both", replica2))
 		replica2 = DotMap.join(replica2, deltas[1][1])
 	})
 
@@ -152,7 +152,7 @@ describe('together', () => {
 	
 	 it('obeys OR semantics', () => {
 	 	const sub = function ([m,cc]) {	return MVReg.write("3", [m,cc])	}
-	 	const writeDelta = ORMap.apply(sub, "a", replica1)
+	 	const writeDelta = ORMap.applyToValue(sub, "a", replica1)
 		replica1 = DotMap.join(replica1, writeDelta)
 
 
@@ -172,7 +172,7 @@ describe('together', () => {
 		replica1 = DotMap.join(replica1, removeDelta)
 
 		const sub1 = function ([m,cc]) {	return MVReg.write("3", [m,cc])	}
-		const d1 = ORMap.apply(sub1, "both", replica1)
+		const d1 = ORMap.applyToValue(sub1, "both", replica1)
 		replica1 = DotMap.join(replica1, d1)
 		replica2 = DotMap.join(replica2, d1)
 
