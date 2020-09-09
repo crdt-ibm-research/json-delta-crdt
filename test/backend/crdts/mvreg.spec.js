@@ -44,8 +44,8 @@ describe('mvreg', () => {
     let deltas = [[], []]
 
     before(() => {
-      replica1 = [new DotFun('mvreg'), new CausalContext(uuid())]
-      replica2 = [new DotFun('mvreg'), new CausalContext(uuid())]
+      replica1 = [new DotFun('mvreg'), new CausalContext('a')]
+      replica2 = [new DotFun('mvreg'), new CausalContext('b')]
     })
 
     it('values can be written concurrently', () => {
@@ -69,6 +69,11 @@ describe('mvreg', () => {
     it('changes can be raw joined - join order 2', () => {
       const join = DotFun.join(replica2, replica1)
       expect(Array.from(MVReg.values(join)).sort()).to.deep.equal(['a', 'b'])
+    })
+
+    it('MVReg value is the highest dot', () => {
+      const join = DotFun.join(replica2, replica1)
+      expect(MVReg.value(join)).to.equal('b')
     })
   })
 

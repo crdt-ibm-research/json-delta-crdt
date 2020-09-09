@@ -6,7 +6,7 @@ const { assert } = require('chai');
 class DotFun {
   constructor (typename, state) {
     this.typename = typename
-    this.state = state || new Map() // {Dot-as-string -> Value}
+    this.state = state || new Map() // {K: I X N => V: DotStore}
   }
 
   static from(other) {

@@ -24,7 +24,7 @@ class ORMap {
                     value = ORMap.value([m.get(key), cc])
                     break;
                 case MVReg.typename():
-                    value = MVReg.value([m.get(key), cc])
+                    value = MVReg.values([m.get(key), cc])
                     break;
                 default:
                     break;
