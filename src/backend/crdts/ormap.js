@@ -44,7 +44,7 @@ class ORMap {
         const nextDot = cc.next()
         const dotFun = new DotFun().set(nextDot, true)
         const retDotMap = new DotMap(ORMap.typename(), new Map().set("_alive", dotFun))
-        const retCC = new CausalContext(cc.getID()).insertDot(nextDot)
+        const retCC = new CausalContext().insertDot(nextDot)
         return [retDotMap, retCC]
     }
 
@@ -75,7 +75,7 @@ class ORMap {
         assert(m instanceof DotMap)
         assert(cc instanceof CausalContext)
 
-        const retCC = new CausalContext(cc.getID()).insertDots(m.get(k).dots())
+        const retCC = new CausalContext().insertDots(m.get(k).dots())
         return [new DotMap(ORMap.typename()), retCC]
     }
 
@@ -86,7 +86,7 @@ class ORMap {
         const nextDot = cc.next()
         const dotFun = new DotFun().set(nextDot, true)
         const retDotMap = new DotMap(ORMap.typename(), new Map().set("_alive",dotFun))
-        const retCC = new CausalContext(cc.getID()).insertDot(nextDot).insertDots(m.dots())
+        const retCC = new CausalContext().insertDot(nextDot).insertDots(m.dots())
 
         return [retDotMap, retCC]
     }

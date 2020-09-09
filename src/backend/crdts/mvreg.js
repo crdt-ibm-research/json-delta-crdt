@@ -21,12 +21,12 @@ class MVReg {
     m = m || new DotFun(MVReg.typename())
     const dot = c.next()
     const newState = new DotFun(m.typename).set(dot, value)
-    const newCC = new CausalContext(c.getID()).insertDot(dot).insertDots(m.dots())
+    const newCC = new CausalContext().insertDot(dot).insertDots(m.dots())
     return [newState, newCC]
   }
 
   static clear([m, c]) {
-    return [new DotFun(m.typename), new CausalContext(c.getID()).insertDots(m.dots())]
+    return [new DotFun(m.typename), new CausalContext().insertDots(m.dots())]
   }
 }
 
