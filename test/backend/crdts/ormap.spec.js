@@ -149,10 +149,10 @@ describe('together', () => {
 		})
 	})
 
-	
-	 it('obeys OR semantics', () => {
-	 	const sub = function ([m,cc]) {	return MVReg.write("3", [m,cc])	}
-	 	const writeDelta = ORMap.applyToValue(sub, "a", replica1)
+
+	it('obeys OR semantics', () => {
+		const sub = function ([m,cc]) {	return MVReg.write("3", [m,cc])	}
+		const writeDelta = ORMap.applyToValue(sub, "a", replica1)
 		replica1 = DotMap.join(replica1, writeDelta)
 
 
@@ -161,14 +161,14 @@ describe('together', () => {
 		expect(ORMap.value(replica2)).to.deep.equal({
 			A : new Set(["2"]),
 			both : new Set(["1", "2"])
-	 	})
+		})
 
-	 	replica2 = DotMap.join(replica2, writeDelta)
-	 	expect(ORMap.value(replica2)).to.deep.equal({
+		replica2 = DotMap.join(replica2, writeDelta)
+		expect(ORMap.value(replica2)).to.deep.equal({
 			a : new Set(["3"]),
 			A : new Set(["2"]),
 			both : new Set(["1", "2"])
-		 })
+			})
 		replica1 = DotMap.join(replica1, removeDelta)
 
 		const sub1 = function ([m,cc]) {	return MVReg.write("3", [m,cc])	}
@@ -180,36 +180,40 @@ describe('together', () => {
 			a : new Set(["3"]),
 			A : new Set(["2"]),
 			both : new Set(["3"])
-		 })
-
+			})
 	})
 
+	it('can have a datatype conflict', () => {
+		const sub = function ([m,cc]) {	return MVReg.write("3", [m,cc])	}
+		const writeDelta = ORMap.applyToValue(sub, "a", replica1)
+		replica1 = DotMap.join(replica1, writeDelta)
 
-//     it('keeps causality', () => {
-//       const delta = replica1.applySub('a', 'mvreg', 'write', 'AA')
-//       expect(replica1.value().a).to.deep.equal(new Set(['AA']))
 
-//       replica2.apply(delta)
-//       expect(replica2.value().a).to.deep.equal(new Set(['AA']))
-//     })
+		const removeDelta = ORMap.remove("a", replica2)
+		replica2 = DotMap.join(replica2, removeDelta)
+		expect(ORMap.value(replica2)).to.deep.equal({
+			A : new Set(["2"]),
+			both : new Set(["1", "2"])
+		})
 
-//     it('add wins', () => {
-//       const delta1 = replica1.remove('b')
-//       expect(replica1.value().b).to.not.exist()
-//       const delta2 = replica2.applySub('b', 'mvreg', 'write', 'BB')
-//       expect(replica2.value().b).to.deep.equal(new Set(['BB']))
-//       replica1.apply(transmit(delta2))
-//       replica2.apply(transmit(delta1))
-//       expect(replica2.value().b).to.deep.equal(new Set(['BB']))
-//       expect(replica1.value().b).to.deep.equal(new Set(['BB']))
-//       // expect(replica1.state().state.get('b')).instanceof(DotSet)
-//       expect(replica1.state().dotstore.get('b')).instanceof(DotFun)
-//     })
+		replica2 = DotMap.join(replica2, writeDelta)
+		expect(ORMap.value(replica2)).to.deep.equal({
+			a : new Set(["3"]),
+			A : new Set(["2"]),
+			both : new Set(["1", "2"])
+			})
+		replica1 = DotMap.join(replica1, removeDelta)
 
-//     it('removals are stored in state', () => {
-//       replica1.remove('b')
-//       expect(replica1.value().b).to.not.exist()
-//       replica2.apply(replica1.state())
-//       expect(replica2.value().b).to.not.exist()
-//     })
+		const sub1 = function ([m,cc]) {	return MVReg.write("3", [m,cc])	}
+		const d1 = ORMap.applyToValue(sub1, "both", replica1)
+		replica1 = DotMap.join(replica1, d1)
+		replica2 = DotMap.join(replica2, d1)
+
+		expect(ORMap.value(replica1)).to.deep.equal({
+			a : new Set(["3"]),
+			A : new Set(["2"]),
+			both : new Set(["3"])
+			})
+	})
+
 })
