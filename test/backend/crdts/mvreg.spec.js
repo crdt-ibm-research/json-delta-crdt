@@ -61,8 +61,13 @@ describe('mvreg', () => {
       expect(MVReg.value(replica2)).to.deep.equal(new Set(['a']))
     })
 
-    it('changes can be raw joined', () => {
+    it('changes can be raw joined - join order 1', () => {
       const join = DotFun.join(replica1, replica2)
+      expect(Array.from(MVReg.value(join)).sort()).to.deep.equal(['a', 'b'])
+    })
+
+    it('changes can be raw joined - join order 2', () => {
+      const join = DotFun.join(replica2, replica1)
       expect(Array.from(MVReg.value(join)).sort()).to.deep.equal(['a', 'b'])
     })
   })
