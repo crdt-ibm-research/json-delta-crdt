@@ -63,7 +63,7 @@ class ORMap {
 		const inner = function ([m,cc]) {return ORMap.apply(o, ARRAY, [m, cc])}
 		const [retMap, retCC] = ORMap.apply(inner, k, [m,cc])
 		
-	// Recommitted an array, delete the other two
+	    // Recommitted an array, delete the other two
 		if (m.get(k) && m.get(k).get(MAP)) {
 			retCC.insertDots(m.get(MAP).dots())
 		}

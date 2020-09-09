@@ -19,6 +19,14 @@ class DotFunMap {
     return Array.from(this.state, ([dot, value]) => [dot, value])
   }
 
+  keys() {
+    return Array.from(this.state, ([dot, value]) => dot)
+  }
+
+  values() {
+    return Array.from(this.state, ([dot, value]) => value)
+  }
+
   dots() { // returns Set()
 		const result = new Set()
 		for (let value of this.state.values()) {
