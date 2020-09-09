@@ -28,6 +28,15 @@ describe('mvreg', () => {
       const res = DotFun.join(after_delta, delta_b)
       expect(MVReg.value(res)).to.deep.equal(new Set(['b']))
     })
+
+    it('can clear mvreg', () => {
+      const mvreg = [new DotFun('mvreg'), new CausalContext(uuid())] 
+      const delta_a = MVReg.write('a', [mvreg[0], mvreg[1]])
+      const after_delta = DotFun.join(mvreg, delta_a)
+      const clear_delta = MVReg.clear(after_delta)
+      const after_clear = DotFun.join(after_delta, clear_delta) 
+      expect(MVReg.value(after_clear)).to.deep.equal(new Set())
+    })
   })
 
   describe('two replicas', () => {
