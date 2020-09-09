@@ -61,7 +61,7 @@ describe('ormap', () => {
 			const d1 = ORMap.applyToMap(sub1, "a", ormap)
 			ormap = DotMap.join(ormap, d1)
 
-			//doc.a.b = 1
+			//doc.a.b = 2
 			const write2 = function ([m,cc]) {	return MVReg.write("2", [m,cc])	}
 			const sub2 = function([m,cc]) { return ORMap.applyToValue(write2, "b", [m,cc])}
 			const d2 = ORMap.applyToMap(sub2, "a", ormap)
@@ -149,7 +149,6 @@ describe('together', () => {
 		})
 	})
 
-
 	it('obeys OR semantics', () => {
 		const sub = function ([m,cc]) {	return MVReg.write("3", [m,cc])	}
 		const writeDelta = ORMap.applyToValue(sub, "a", replica1)
@@ -184,36 +183,13 @@ describe('together', () => {
 	})
 
 	it('can have a datatype conflict', () => {
-		const sub = function ([m,cc]) {	return MVReg.write("3", [m,cc])	}
-		const writeDelta = ORMap.applyToValue(sub, "a", replica1)
-		replica1 = DotMap.join(replica1, writeDelta)
-
-
-		const removeDelta = ORMap.remove("a", replica2)
-		replica2 = DotMap.join(replica2, removeDelta)
-		expect(ORMap.value(replica2)).to.deep.equal({
-			A : new Set(["2"]),
-			both : new Set(["1", "2"])
-		})
-
-		replica2 = DotMap.join(replica2, writeDelta)
-		expect(ORMap.value(replica2)).to.deep.equal({
-			a : new Set(["3"]),
-			A : new Set(["2"]),
-			both : new Set(["1", "2"])
-			})
-		replica1 = DotMap.join(replica1, removeDelta)
-
-		const sub1 = function ([m,cc]) {	return MVReg.write("3", [m,cc])	}
-		const d1 = ORMap.applyToValue(sub1, "both", replica1)
+		var sub = ORMap.create
+		const d1 = ORMap.applyToMap(sub, "conflict", replica1)
 		replica1 = DotMap.join(replica1, d1)
-		replica2 = DotMap.join(replica2, d1)
 
-		expect(ORMap.value(replica1)).to.deep.equal({
-			a : new Set(["3"]),
-			A : new Set(["2"]),
-			both : new Set(["3"])
-			})
+		sub = function ([m,cc]) { return MVReg.write("1", [m,cc]) }
+		const d2 = ORMap.applyToMap(sub, "conflict", replica2)
+		replica2 = DotMap.join(replica2, d2)
+
 	})
-
 })

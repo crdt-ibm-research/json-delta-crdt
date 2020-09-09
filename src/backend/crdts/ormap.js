@@ -48,10 +48,11 @@ class ORMap {
 		const inner = function ([m,cc]) {return ORMap.apply(o, MAP, [m, cc])}
 		const [retMap, retCC] = ORMap.apply(inner, k, [m,cc])
 
-		if (m.get(ARRAY)) {
+		// Recommitted a map, delete the other two
+		if (m.get(k) && m.get(k).get(ARRAY)) {
 			retCC.insertDots(m.get(ARRAY).dots())
 		}
-		if (m.get(VALUE)) {
+		if (m.get(k) && m.get(k).get(VALUE)) {
 			retCC.insertDots(m.get(VALUE).dots())
 		}
 
@@ -62,10 +63,11 @@ class ORMap {
 		const inner = function ([m,cc]) {return ORMap.apply(o, ARRAY, [m, cc])}
 		const [retMap, retCC] = ORMap.apply(inner, k, [m,cc])
 		
-		if (m.get(MAP)) {
+	// Recommitted an array, delete the other two
+		if (m.get(k) && m.get(k).get(MAP)) {
 			retCC.insertDots(m.get(MAP).dots())
 		}
-		if (m.get(VALUE)) {
+		if (m.get(k) && m.get(k).get(VALUE)) {
 			retCC.insertDots(m.get(VALUE).dots())
 		}
 
@@ -76,10 +78,11 @@ class ORMap {
 		const inner = function ([m,cc]) {return ORMap.apply(o, VALUE, [m, cc])}
 		const [retMap, retCC] = ORMap.apply(inner, k, [m,cc])
 		
-		if (m.get(MAP)) {
+		// Recommitted a value, delete the other two
+		if (m.get(k) && m.get(k).get(MAP)) {
 			retCC.insertDots(m.get(MAP).dots())
 		}
-		if (m.get(ARRAY)) {
+		if (m.get(k) && m.get(k).get(ARRAY)) {
 			retCC.insertDots(m.get(ARRAY).dots())
 		}
 
