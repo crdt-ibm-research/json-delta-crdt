@@ -41,7 +41,6 @@ class ORMap {
         assert(m instanceof DotMap)
         assert(cc instanceof CausalContext)
 
-        // TODO: Add DotFun with key _alive_
         const nextDot = cc.next()
         const dotFun = new DotFun().set(nextDot, true)
         const retDotMap = new DotMap(ORMap.typename(), new Map().set("_alive", dotFun))
@@ -56,15 +55,19 @@ class ORMap {
         assert(m.typename === ORMap.typename())
         assert(cc instanceof CausalContext)
 
-        // TODO: Add DotFun with key _alive_
-        const [newV, retCC] = o([m.get(k), cc])
-        const retDotMap = new DotMap(ORMap.typename(), new Map().set(k ,newV) )
-        
-        // TODO: Check with Arik cc.next() may already be allocated if this is a new key
+        const retDotMap = new DotMap(ORMap.typename())
+
+        // First add _alive
         const nextDot = cc.next()
-        const dotFun = new DotFun().set(nextDot, true)
+        const dotFun = new DotFun(MVReg.typename()).set(nextDot, true)
         retDotMap.set("_alive", dotFun)
-        retCC.insertDot(nextDot)
+
+        // Next call o (don't forget to add the dot to the CC)
+        const [newV, retCC] = o([m.get(k), cc.insertDot(nextDot, true)])
+        retDotMap.set(k ,newV)
+
+        // Insert the dot of _alive
+        retCC.insertDot(nextDot, true)
         return [retDotMap, retCC]
     }
 
@@ -79,8 +82,6 @@ class ORMap {
     static clear([m,cc]) {        
         assert(m instanceof DotMap)
         assert(cc instanceof CausalContext)
-
-        // TODO: Add DotFun with key _alive_
 
         const nextDot = cc.next()
         const dotFun = new DotFun().set(nextDot, true)

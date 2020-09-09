@@ -36,7 +36,7 @@ class DotMap {
   }
 
   set(key, value) {
-	  return this.state.set(key, value)
+	return this.state.set(key, value)
   }
 
 	// returns the join
