@@ -2,7 +2,7 @@
 
 const uuid = require('./uuid')
 const ORMap = require('./crdts/ormap')
-const CausalContext = require('./crdts/causal-context')
+const CausalContext = require('./causal-context')
 
 class Backend {
     constructor(id, state) {
