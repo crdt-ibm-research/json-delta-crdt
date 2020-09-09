@@ -8,6 +8,15 @@ class MVReg {
     return "mvreg"
   }
 
+  static values([m, c]) {
+    const ret = new Set()
+    for (let [, value] of m.items()) {
+      ret.add(value)
+    }
+    return ret
+  }
+
+  // TODO: get highest dot
   static value([m, c]) {
     const ret = new Set()
     for (let [, value] of m.items()) {
