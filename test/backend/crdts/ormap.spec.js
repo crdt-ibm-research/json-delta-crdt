@@ -150,23 +150,39 @@ describe('together', () => {
 	})
 
 	
-	// it('obeys OR semantics', () => {
-	// 	const sub = function ([m,cc]) {	return MVReg.write("3", [m,cc])	}
-	// 	const writeDelta = ORMap.apply(sub, "a", replica1)
+	 it('obeys OR semantics', () => {
+	 	const sub = function ([m,cc]) {	return MVReg.write("3", [m,cc])	}
+	 	const writeDelta = ORMap.apply(sub, "a", replica1)
+		replica1 = DotMap.join(replica1, writeDelta)
 
-	// 	const removeDelta = ORMap.remove("a", replica2)
-	// 	expect(ORMap.value(replica2)).to.deep.equal({
-	// 		A : new Set(["2"]),
-	// 		both : new Set(["1", "2"])
-	// 	})
 
-	// 	replica2 = DotMap.join(replica2, writeDelta)
-	// 	expect(ORMap.value(replica2)).to.deep.equal({
-	// 		a : new Set(["3"]),
-	// 		A : new Set(["2"]),
-	// 		both : new Set(["1", "2"])
-	// 	})
-	// })
+		const removeDelta = ORMap.remove("a", replica2)
+		replica2 = DotMap.join(replica2, removeDelta)
+		expect(ORMap.value(replica2)).to.deep.equal({
+			A : new Set(["2"]),
+			both : new Set(["1", "2"])
+	 	})
+
+	 	replica2 = DotMap.join(replica2, writeDelta)
+	 	expect(ORMap.value(replica2)).to.deep.equal({
+			a : new Set(["3"]),
+			A : new Set(["2"]),
+			both : new Set(["1", "2"])
+		 })
+		replica1 = DotMap.join(replica1, removeDelta)
+
+		const sub1 = function ([m,cc]) {	return MVReg.write("3", [m,cc])	}
+		const d1 = ORMap.apply(sub1, "both", replica1)
+		replica1 = DotMap.join(replica1, d1)
+		replica2 = DotMap.join(replica2, d1)
+
+		expect(ORMap.value(replica1)).to.deep.equal({
+			a : new Set(["3"]),
+			A : new Set(["2"]),
+			both : new Set(["3"])
+		 })
+
+	})
 
 
 //     it('keeps causality', () => {
