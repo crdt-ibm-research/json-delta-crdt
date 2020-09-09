@@ -1,20 +1,26 @@
 'use strict'
 
 const CustomSet = require('./custom-set')
+const uuid = require('./uuid')
+const { assert } = require('chai');
 
 // Autonomous causal context, for context sharing in maps
 // Methods of CausalContext mutate its own state
 class CausalContext {
-  constructor() {
+  // The id is used for creating new dots.
+  // replicas have a CausalContext with id.
+  // delta do not have an id as it is doesn't create dots.
+  constructor(id) {
     this._cc = new Map() // compact causal context {ID->INT}
     this._dc = new CustomSet() // dot cloud SET([id,int], ...)
+    this._id = id
   }
 
   static from(other) {
-    // if (!(other instanceof CausalContext)) {
-    //   throw new Error('expected CausalContext')
-    // }
-    const result = new CausalContext()
+    if (!(other instanceof CausalContext)) {
+      throw new Error('expected CausalContext')
+    }
+    const result = new CausalContext(other._id)
     result._cc = new Map([...other._cc])
     result._dc = CustomSet.from(other._dc)
     return result
@@ -60,16 +66,22 @@ class CausalContext {
     return this
   }
 
-  _next(id) {
-    const value = this._cc.get(id) || 0
-    const newValue = value + 1
-    return [id, newValue]
+  getID() {
+    return this._id
   }
 
-  makeDot(id) {
+  next() {
+    assert(this._id !== undefined, "id is undefined, deltas cc cannot be used to create dots")
+    const value = this._cc.get(this._id) || 0
+    const newValue = value + 1
+    return [this._id, newValue]
+  }
+
+  makeDot() {
+    assert(this._id !== undefined, "id is undefined, deltas cc cannot be used to create dots")
     // On a valid dot generator, all dots should be compact on the used id
     // Making the new dot, updates the dot generator and returns the dot
-    const n = this._next(id)
+    const n = this.next(this._id)
     this._cc.set(n[0], n[1])
     return n
   }
@@ -90,11 +102,11 @@ class CausalContext {
   }
 
   join(other) {
+    assert(other instanceof CausalContext, "join should receive a causal context")
     if (this === other) return this // Join is idempotent, but just dont do it.
 
-    if (!(other instanceof CausalContext)) {
-      other = CausalContext.from(other)
-    }
+    // preserve the id when joining with a replica
+    this._id = this._id || other._id
 
     const allKeys = new Set([...this._cc.keys(), ...other._cc.keys()])
     for (let key of allKeys) {
