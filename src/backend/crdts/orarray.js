@@ -8,14 +8,62 @@ const MVReg = require('./mvreg')
 const { ALIVE, FIRST, SECOND } = require('../constants')
 const DotFun = require('../dotstores/dot-fun')
 const DotFunMap = require('../dotstores/dot-fun-map')
+const ORMap = require('./ormap')
 
 class ORArray {
 	static typename() {
 		return "or-array"
 	}
 
-	static value(pos, [m, cc]) {
-		assert(m instanceof DotMap)
+	static value([m, cc]) {
+        assert(m instanceof DotMap)
+        assert(cc instanceof CausalContext)
+
+        let tmpArray = []
+		for (let [uid, pair] of m.state.entries()) {
+            if (uid === ALIVE) continue
+            // get value
+            const value = pair.get(FIRST)
+            let valueFun
+            switch (value.typename) {
+                case MVReg.typename():
+                    valueFun = MVReg.value
+                    break;
+                case ORMap.typename():
+                    valueFun = ORMap.value
+                    break;
+                case ORArray.typename():
+                    valueFun = ORArray.value
+                    break
+                default:
+                    // TODO: throw error
+                    break;
+            }
+
+            const v = valueFun([value, cc])
+            
+            // get position
+            const maxRoot = pair.get(SECOND).keys().reduce(CausalContext.maxDot)
+            const maxDot = pair.get(SECOND).get(maxRoot).keys().reduce(CausalContext.maxDot)
+            const p = pair.get(SECOND).get(maxRoot).get(maxDot)
+
+			// if (innerMap.has(MAP)) {
+			// 	value = ORMap.value([innerMap.get(MAP), cc])
+			// } else if (innerMap.has(ARRAY)) {
+			// 	value = ORArray.values([innerMap.get(ARRAY), cc])
+			// } else {
+			// 	value = MVReg.values([innerMap.get(VALUE), cc])
+			// }
+			tmpArray.push([v, p])
+        }
+
+        // sort the array
+        let retArray
+        for (let [v, p] of tmpArray.sort((a, b) => a[1] - b[1])) {
+            retArray.push(v)
+        }
+
+		return retArray
 	}
 
 	static create([m,cc]) {

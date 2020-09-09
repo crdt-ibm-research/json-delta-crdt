@@ -17,6 +17,15 @@ class DotFun {
     return Array.from(this.state, ([dot, value]) => [dot, value])
   }
 
+
+  keys() {
+    return Array.from(this.state, ([dot, value]) => dot)
+  }
+
+  values() {
+    return Array.from(this.state, ([dot, value]) => value)
+  }
+
   dots () {
     return new Set(Array.from(this.state.keys()))
   }

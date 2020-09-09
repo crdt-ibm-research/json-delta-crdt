@@ -19,19 +19,7 @@ class MVReg {
   // returns the value of the MVReg solving conlicts according to:
   // dot is [String, Integer], so first largest Integer then largest String
   static value([m, c]) {
-    const max_dot = [...m.dots()].reduce(function(prev, current) {
-      if (prev[1] > current[1]) {
-        return prev
-      } else if (prev[1] == current[1]) {
-        if (prev[0] > current[0]) {
-          return prev
-        } else {
-          return current
-        }
-      } else {
-        return current
-      }
-    }) 
+    const max_dot = [...m.dots()].reduce(CausalContext.maxDot)
     return m.get(max_dot)
   }
 
