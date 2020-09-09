@@ -6,6 +6,7 @@ const DotMap = require('../dotstores/dot-map')
 const DotFun = require('../dotstores/dot-fun')
 const CausalContext = require('../causal-context')
 const MVReg = require('./mvreg')
+const { ALIVE } = require('../constants')
 
 class ORMap {
     static typename() {
@@ -17,7 +18,7 @@ class ORMap {
 
         let retMap = {}
         for (let [key, value] of m.state.entries()) {
-            if (key === "_alive") continue
+            if (key === ALIVE) continue
             const type = m.get(key).typename
             switch (type) {
                 case ORMap.typename():
@@ -36,15 +37,15 @@ class ORMap {
     }
 
     static create([m,cc]) {
+        
         m = m || new DotMap(ORMap.typename())
 
         assert(m instanceof DotMap)
         assert(cc instanceof CausalContext)
+        
+        const [retFun, retCC] = MVReg.write(true, [m.get(ALIVE), cc])
+        const retDotMap = new DotMap(ORMap.typename(), new Map().set(ALIVE, retFun))
 
-        const nextDot = cc.next()
-        const dotFun = new DotFun().set(nextDot, true)
-        const retDotMap = new DotMap(ORMap.typename(), new Map().set("_alive", dotFun))
-        const retCC = new CausalContext().insertDot(nextDot)
         return [retDotMap, retCC]
     }
 
@@ -57,18 +58,15 @@ class ORMap {
 
         const retDotMap = new DotMap(ORMap.typename())
 
-        // First add _alive
-        const nextDot = cc.next()
-        const dotFun = new DotFun(MVReg.typename()).set(nextDot, true)
-        retDotMap.set("_alive", dotFun)
+        // First add ALIVE
+        const [fun, funCC] = MVReg.write(true, [m.get(ALIVE), cc])
+        retDotMap.set(ALIVE, fun)
 
         // Next call o (don't forget to add the dot to the CC)
-        const [newV, retCC] = o([m.get(k), cc.insertDot(nextDot, true)])
+        const [newV, retCC] = o([m.get(k), cc.join(funCC)])
         retDotMap.set(k ,newV)
 
-        // Insert the dot of _alive
-        retCC.insertDot(nextDot, true)
-        return [retDotMap, retCC]
+        return [retDotMap, retCC.join(funCC)]
     }
 
     static remove(k, [m,cc]) {
@@ -83,10 +81,14 @@ class ORMap {
         assert(m instanceof DotMap)
         assert(cc instanceof CausalContext)
 
-        const nextDot = cc.next()
-        const dotFun = new DotFun().set(nextDot, true)
-        const retDotMap = new DotMap(ORMap.typename(), new Map().set("_alive",dotFun))
-        const retCC = new CausalContext().insertDot(nextDot).insertDots(m.dots())
+        const retDotMap = new DotMap(ORMap.typename())
+
+        // First write ALIVE
+        const [fun, funCC] = MVReg.write(true, [m.get(ALIVE), cc])
+        retDotMap.set(ALIVE, fun)
+
+        // Next remove all dots
+        const retCC = funCC.insertDots(m.dots())
 
         return [retDotMap, retCC]
     }
