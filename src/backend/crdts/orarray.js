@@ -37,7 +37,7 @@ class ORArray {
             const maxRoot = pair.get(SECOND).keys().reduce(CausalContext.maxDot)
             const maxDot = pair.get(SECOND).get(maxRoot).keys().reduce(CausalContext.maxDot)
             const p = pair.get(SECOND).get(maxRoot).get(maxDot)
-            
+
 			tmpArray.push([v, p])
         }
 
@@ -83,7 +83,7 @@ class ORArray {
 		
         // Recommitted an array, delete the other two
         if (m.get(uid) && m.get(uid).get(FIRST).get(MAP)) {
-			retCC.insertDots(m.get(uid).get(FIRST).get(ARRAY).dots())
+			retCC.insertDots(m.get(uid).get(FIRST).get(MAP).dots())
 		}
 		if (m.get(uid) && m.get(uid).get(FIRST).get(VALUE)) {
 			retCC.insertDots(m.get(uid).get(FIRST).get(VALUE).dots())
@@ -101,7 +101,7 @@ class ORArray {
 			retCC.insertDots(m.get(uid).get(FIRST).get(MAP).dots())
 		}
 		if (m.get(uid) && m.get(uid).get(FIRST).get(ARRAY)) {
-			retCC.insertDots(m.get(uid).get(FIRST).get(VALUE).dots())
+			retCC.insertDots(m.get(uid).get(FIRST).get(ARRAY).dots())
         }
 
 		return [retMap, retCC]
