@@ -1,3 +1,9 @@
+const DotMap = require('../../src/backend/dotstores/dot-map')
+const ORMap = require('../../src/backend/crdts/ormap')
+const CausalContext = require('../../src/backend/causal-context')
+const MVReg = require('../../src/backend/crdts/mvreg')
+const { VALUE } = require('../../src/backend/constants')
+
 class Context {
     constructor() {
         // maps UUID to (parent-uuid, parent-type, my-identifier-in-parent)
@@ -10,12 +16,14 @@ class Context {
    * object is an existing Automerge object, its existing ID is returned.
    */
   static genNestedObjectCreation(value) {
+    /*
     if (typeof value[OBJECT_ID] === 'string') {
       throw new TypeError(
         'Cannot assign an object that already belongs to an Automerge document. ' +
         'See https://github.com/automerge/automerge#making-fine-grained-changes')
     }
-    const objectId = uuid()
+    */
+    //const objectId = uuid()
 
     if (Array.isArray(value)) {
 
@@ -24,16 +32,17 @@ class Context {
       let f = function ([m,cc]) {	
         let ormap = [new DotMap(ORMap.typename()), cc] 
         for (let key of Object.keys(value)) {
-            const [currFunc, currType] = genSetValue(value.get(key))
+            console.log("val: ", value, " key: ", key, "val[key]: ", value[key])
+            const [currFunc, currType] = Context.genSetValue(value[key])
             let delta
             if (currType === 'primitive') {
-                delta = ORMap.applyToValue(f, key, ormap)
+                delta = ORMap.applyToValue(currFunc, key, ormap)
             } else if (currType === "map") {
-                delta = ORMap.applyToMap(f, key, ormap)
+                delta = ORMap.applyToMap(currFunc, key, ormap)
             } else if (currType === "array") {
-                delta = ORMap.applyToArray(f, key, ormap)
+                delta = ORMap.applyToArray(currFunc, key, ormap)
             }
-            ormap = ORMap.join(ormap, delta)
+            ormap = DotMap.join(ormap, delta)
         }
         return ormap
       }
@@ -44,12 +53,11 @@ class Context {
   }
 
   static genSetValue(value) {
-      if (typeof value !== 'string') {
-          throw new TypeError("keys can only be strings!")
-      }
+    console.log(value)
+      console.log(isObject(value))
       if (isObject(value)) {
           // another nesting, get the creation func
-          return genNestedObjectCreation(value)
+          return Context.genNestedObjectCreation(value)
       } else {
           // we have a primitive
           const f = function ([m,cc]) {
