@@ -42,7 +42,7 @@ class ORArray {
         }
 
         // sort the array
-        let retArray
+        let retArray = []
         for (let [v, p] of tmpArray.sort((a, b) => a[1] - b[1])) {
             retArray.push(v)
         }
@@ -105,7 +105,22 @@ class ORArray {
         }
 
 		return [retMap, retCC]
-	}
+    }
+    
+    static insertToMap(uid, o, p, [m,cc]) {
+        const inner = function ([m,cc]) {return ORMap.apply(o, MAP, [m, cc])}
+        return ORArray.insert(uid, inner, p, [m,cc])
+    }
+
+    static insertToArray(uid, o, p, [m,cc]) {
+        const inner = function ([m,cc]) {return ORMap.apply(o, ARRAY, [m, cc])}
+        return ORArray.insert(uid, inner, p, [m,cc])
+    }
+
+    static insertToArray(uid, o, p, [m,cc]) {
+        const inner = function ([m,cc]) {return ORMap.apply(o, VALUE, [m, cc])}
+        return ORArray.insert(uid, inner, p, [m,cc])
+    }
 
 	static insert(uid, o, p, [m,cc]) {
 		m = m || new DotMap(ORArray.typename())
