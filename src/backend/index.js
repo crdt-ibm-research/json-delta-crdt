@@ -40,7 +40,6 @@ class Backend {
 
     // joins a delta with the current state
     joinDelta(delta) {
-      // update the current backend state
       this._state = this._joinFunction(this._state, delta)
     }
 
