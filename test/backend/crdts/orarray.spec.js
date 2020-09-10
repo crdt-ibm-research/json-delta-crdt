@@ -12,44 +12,42 @@ const ORMap = require('../../../src/backend/crdts/ormap')
 const CausalContext = require('../../../src/backend/causal-context')
 const MVReg = require('../../../src/backend/crdts/mvreg')
 const { VALUE } = require('../../../src/backend/constants')
+const ORArray = require('../../../src/backend/crdts/orarray')
 
-describe('ormap', () => {
+describe('orarray', () => {
 	describe('local', () => {
-		let ormap
+		let orarray
 
 		it('type can be created', () => {
-			ormap = [new DotMap(ORMap.typename()), new CausalContext("r1")] 
+			orarray = [new DotMap(ORArray.typename()), new CausalContext("r1")] 
 		})
 
 		it('starts empty', () => {
-			expect(ORMap.value(ormap)).to.deep.equal({})
+			expect(ORArray.value(orarray)).to.deep.equal([])
 		})
 
 		it('can apply a causal CRDT', () => {
-			const sub = function ([m,cc]) {	return MVReg.write("1", [m,cc])	}
-			const delta = ORMap.applyToValue(sub, "a", ormap)
+			const writeA = function ([m,cc]) {	return MVReg.write("a", [m,cc])	}
+            const d1 = ORArray.insertValue("a", writeA, 0.5, orarray)
 
-			ormap = DotMap.join(ormap, delta)
-			expect(ORMap.value(ormap)).to.deep.equal(
-				{"a" : new Set("1")}
-			)
+            orarray = DotMap.join(orarray, d1)
+			expect(ORArray.value(orarray)).to.deep.equal([new Set(["a"])])
 		})
 
 		it('can apply a causal CRDT again', () => {
-			const sub = function ([m,cc]) {	return MVReg.write("2", [m,cc])	}
-			const delta = ORMap.applyToValue(sub, "a", ormap)
-			ormap = DotMap.join(ormap, delta)
-			expect(ORMap.value(ormap)).to.deep.equal(
-				{"a" : new Set("2")}
-			)
+            const writeB = function ([m,cc]) {	return MVReg.write("b", [m,cc])	}
+            const d1 = ORArray.applyToValue("a", writeB, 0.5, orarray)
+
+            orarray = DotMap.join(orarray, d1)
+            expect(ORArray.value(orarray)).to.deep.equal([new Set(["b"])])
 		})
 
 		it('can remove', () => {
-			const delta = ORMap.remove("a", ormap)
-			ormap = DotMap.join(ormap, delta)
-			expect(ORMap.value(ormap)).to.deep.equal({})
+			const delta = ORArray.delete("a", orarray)
+			orarray = DotMap.join(orarray, delta)
+			expect(ORArray.value(orarray)).to.deep.equal([])
 		})
-
+/*
 		it('can embed another ormap', () => {
 			const sub = ORMap.create
 			const delta = ORMap.applyToMap(sub, "a", ormap)
@@ -83,10 +81,11 @@ describe('ormap', () => {
 			const d4 = ORMap.remove("a", ormap)
 			ormap = DotMap.join(ormap, d4)
 			expect(ORMap.value(ormap)).to.deep.equal({})
-		})
+        })
+        */
 	})
 })
-
+/*
 describe('together', () => {
 	let replica1, replica2
   let deltas = [[], []]
@@ -231,3 +230,4 @@ describe('together', () => {
 		})
 	})
 })
+*/

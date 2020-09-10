@@ -1,22 +1,23 @@
 'use strict'
 
 const CausalContext = require('../causal-context')
+const DotFun = require('./dot-fun');
+const DotMap = require('./dot-map');
 const { assert } = require('chai');
 
-class DotFun {
+class DotFunMap {
   constructor (typename, state) {
     this.typename = typename
     this.state = state || new Map() // {K: I X N => V: DotStore}
   }
 
   static from(other) {
-    return new DotFun(other.typename, new Map([...other.state]))
+    return new DotFunMap(other.typename, new Map([...other.state]))
   }
 
   items() {
     return Array.from(this.state, ([dot, value]) => [dot, value])
   }
-
 
   keys() {
     return Array.from(this.state, ([dot, value]) => dot)
@@ -26,12 +27,21 @@ class DotFun {
     return Array.from(this.state, ([dot, value]) => value)
   }
 
-  dots () {
-    return new Set(Array.from(this.state.keys()))
-  }
+  dots() { // returns Set()
+		const result = new Set()
+		for (let value of this.state.values()) {
+			let dots = value.dots()
+			dots.forEach(result.add, result);
+		}
+		return result
+	}
 
   isBottom () {
     return this.state.size === 0
+  }
+
+  size() {
+    return this.state.size
   }
 
   get(dot) {
@@ -50,22 +60,38 @@ class DotFun {
   // join does not affect state, , returns delta
   static join ([m1, cc1], [m2, cc2]) {
     // handle undefined
-    m1  = m1 || new DotFun()
-    m2  = m2 || new DotFun()
+    m1  = m1 || new DotFunMap()
+    m2  = m2 || new DotFunMap()
     
-    assert(m1 instanceof DotFun, "left hand dotstore is not an instance of DotFun")
-    assert(m2 instanceof DotFun, "right hand dotstore is not an instance of DotFun")
+    assert(m1 instanceof DotFunMap, "left hand dotstore is not an instance of DotFunMap")
+    assert(m2 instanceof DotFunMap, "right hand dotstore is not an instance of DotFunMap")
     assert(cc1 instanceof CausalContext, "left hand has invalid CausalContext")
     assert(cc2 instanceof CausalContext, "right hand has invalid CausalContext")
 
     const allDots = new Set([...m1.state.keys(), ...m2.state.keys()])
-    const resultDotStore = new DotFun(m1.typename || m2.typename)
+    const resultDotStore = new DotFunMap(m1.typename || m2.typename)
     // NOTE: Assuming all keys are dots
     for (const dot of allDots) {
       if (m1.has(dot) && m2.has(dot)) {
-        // No need to support join of values as we assume dots are unique
-        assert(m1.get(dot) === m2.get(dot), "Error - both dotstores contain the same dot with different value")
-        resultDotStore.set(dot, m1.get(dot))
+        let left = m1.get(dot) // DotStore
+        let right = m2.get(dot) // DotStore
+        
+        const type = left || right
+        let joinFunction;
+        if (type instanceof DotMap) {
+          joinFunction = DotMap.join
+        }	else if (type instanceof DotFun) {
+          joinFunction = DotFun.join
+        } else if (type instanceof DotFunMap) {
+          joinFunction = DotFunMap.join
+        }
+
+        const res = joinFunction([left, cc1] , [right, cc2])
+        const valueForKey = res[0]
+
+        if (!valueForKey.isBottom()) {
+          resultDotStore.set(key, valueForKey)
+        }
       } else if (m1.has(dot) && !cc2.dotIn(dot)) {
         resultDotStore.set(dot, m1.get(dot))
       } else if (m2.has(dot) && !cc1.dotIn(dot)){
@@ -76,4 +102,4 @@ class DotFun {
   }
 }
 
-module.exports = DotFun
+module.exports = DotFunMap

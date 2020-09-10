@@ -26,6 +26,20 @@ class CausalContext {
     return result
   }
 
+  static maxDot(dotA, dotB) {
+    if (dotA[1] > dotB[1]) {
+      return dotA
+    } else if (dotA[1] == dotB[1]) {
+      if (dotA[0] > dotB[0]) {
+        return dotA
+      } else {
+        return dotB
+      }
+    } else {
+      return dotB
+    }
+  }
+
   dotIn(dot) {
     const [key, value] = dot
     const count = this._cc.get(key)

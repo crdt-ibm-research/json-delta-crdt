@@ -8,12 +8,19 @@ class MVReg {
     return "mvreg"
   }
 
-  static value([m, c]) {
+  static values([m, c]) {
     const ret = new Set()
     for (let [, value] of m.items()) {
       ret.add(value)
     }
     return ret
+  }
+
+  // returns the value of the MVReg solving conlicts according to:
+  // dot is [String, Integer], so first largest Integer then largest String
+  static value([m, c]) {
+    const max_dot = [...m.dots()].reduce(CausalContext.maxDot)
+    return m.get(max_dot)
   }
 
   static write(value, [m, c]) {
