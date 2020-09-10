@@ -5,7 +5,7 @@ const { assert } = require('chai')
 const DotMap = require('../dotstores/dot-map')
 const CausalContext = require('../causal-context')
 const MVReg = require('./mvreg')
-const { ALIVE, FIRST, SECOND, ARRAY, VALUE } = require('../constants')
+const { ALIVE, FIRST, SECOND, MAP, ARRAY, VALUE } = require('../constants')
 const DotFun = require('../dotstores/dot-fun')
 const DotFunMap = require('../dotstores/dot-fun-map')
 const ORMap = require('./ormap')
@@ -136,7 +136,7 @@ class ORArray {
 		const [v, retCC] = o([m.get(uid), cc])
 
 		const d = CausalContext.from(cc).join(retCC).next()
-		retCC.insert(d)
+		retCC.insertDot(d, true)
 
 		const dotFun = new DotFun()
 		dotFun.set(d, p)
@@ -150,7 +150,7 @@ class ORArray {
 
 		retDotMap.set(uid, pair)
 
-		return [retDotMap, CausalContext.from(funCC).join(retCC).insert(d)]
+		return [retDotMap, CausalContext.from(funCC).join(retCC).insertDot(d, true)]
 	}
 
 	static apply(uid, o, p, [m,cc]) {

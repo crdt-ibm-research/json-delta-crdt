@@ -3,6 +3,7 @@
 const { assert } = require('chai');
 const CausalContext = require('../causal-context')
 const DotFun = require('./dot-fun');
+const DotFunMap = require('./dot-fun-map');
 
 class DotMap {
 	constructor(typename, state) {
@@ -61,7 +62,9 @@ class DotMap {
 		let joinFunction;
 		if (type instanceof DotMap) {
 			joinFunction = DotMap.join
-		}	else if (type instanceof DotFun) {
+		}	else if (type instanceof DotFunMap) {
+			joinFunction = DotFunMap.join
+		} else {
 			joinFunction = DotFun.join
 		}
 
