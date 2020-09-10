@@ -182,7 +182,7 @@ class ORArray {
 
         let roots = new CausalContext().insertDots(m.get(uid).get(SECOND).keys())
 
-        return [retDotMap, CausalContext.from(funCC).join(retCC).insert(d).join(roots)]
+        return [retDotMap, CausalContext.from(funCC).join(retCC).insertDot(d, true).join(roots)]
 	}
 
 	static move(uid, p, [m,cc]) {
@@ -206,7 +206,7 @@ class ORArray {
         const retDotMap = new DotMap(ORArray.typename(), new Map())
         retDotMap.set(uid, pair)
 
-        return [retDotMap, CausalContext.from(cc).insert(d).join(children)]
+        return [retDotMap, CausalContext.from(cc).insertDot(d, true).join(children)]
 	}
 
 	static delete(uid, [m,cc]) {
