@@ -107,17 +107,17 @@ class ORArray {
 		return [retMap, retCC]
     }
     
-    static insertToMap(uid, o, p, [m,cc]) {
+    static insertMap(uid, o, p, [m,cc]) {
         const inner = function ([m,cc]) {return ORMap.apply(o, MAP, [m, cc])}
         return ORArray.insert(uid, inner, p, [m,cc])
     }
 
-    static insertToArray(uid, o, p, [m,cc]) {
+    static insertArray(uid, o, p, [m,cc]) {
         const inner = function ([m,cc]) {return ORMap.apply(o, ARRAY, [m, cc])}
         return ORArray.insert(uid, inner, p, [m,cc])
     }
 
-    static insertToArray(uid, o, p, [m,cc]) {
+    static insertValue(uid, o, p, [m,cc]) {
         const inner = function ([m,cc]) {return ORMap.apply(o, VALUE, [m, cc])}
         return ORArray.insert(uid, inner, p, [m,cc])
     }
