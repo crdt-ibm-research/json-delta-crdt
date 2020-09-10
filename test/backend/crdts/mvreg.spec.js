@@ -13,11 +13,18 @@ const CausalContext = require('../../../src/backend/causal-context')
 
 describe('mvreg', () => {
   describe('local', () => {
-    it('can write value', () => {
+    it('can write string value', () => {
       const mvreg = [new DotFun('mvreg'), new CausalContext(uuid())] 
       const delta = MVReg.write('a', [mvreg[0], mvreg[1]])
       const res = DotFun.join(mvreg, delta)
       expect(MVReg.values(res)).to.deep.equal(new Set(['a']))
+    })
+
+    it('can write int value', () => {
+      const mvreg = [new DotFun('mvreg'), new CausalContext(uuid())] 
+      const delta = MVReg.write(1, [mvreg[0], mvreg[1]])
+      const res = DotFun.join(mvreg, delta)
+      expect(MVReg.values(res)).to.deep.equal(new Set([1]))
     })
 
     it('can write multiple values and keep the last - join order 1', () => {

@@ -5,7 +5,7 @@ const { assert } = require('chai')
 const DotMap = require('../dotstores/dot-map')
 const CausalContext = require('../causal-context')
 const MVReg = require('./mvreg')
-const { ALIVE, FIRST, SECOND } = require('../constants')
+const { ALIVE, FIRST, SECOND, ARRAY, VALUE } = require('../constants')
 const DotFun = require('../dotstores/dot-fun')
 const DotFunMap = require('../dotstores/dot-fun-map')
 const ORMap = require('./ormap')
@@ -21,39 +21,23 @@ class ORArray {
 
         let tmpArray = []
 		for (let [uid, pair] of m.state.entries()) {
-            if (uid === ALIVE) continue
             // get value
-            const value = pair.get(FIRST)
-            let valueFun
-            switch (value.typename) {
-                case MVReg.typename():
-                    valueFun = MVReg.value
-                    break;
-                case ORMap.typename():
-                    valueFun = ORMap.value
-                    break;
-                case ORArray.typename():
-                    valueFun = ORArray.value
-                    break
-                default:
-                    // TODO: throw error
-                    break;
+            if (uid === ALIVE) continue
+            const innerMap = pair.get(FIRST)
+            let v
+            if (innerMap.has(MAP)) {
+				v = ORMap.value([innerMap.get(MAP), cc])
+			} else if (innerMap.has(ARRAY)) {
+				v = ORArray.values([innerMap.get(ARRAY), cc])
+			} else {
+				v = MVReg.values([innerMap.get(VALUE), cc])
             }
-
-            const v = valueFun([value, cc])
             
             // get position
             const maxRoot = pair.get(SECOND).keys().reduce(CausalContext.maxDot)
             const maxDot = pair.get(SECOND).get(maxRoot).keys().reduce(CausalContext.maxDot)
             const p = pair.get(SECOND).get(maxRoot).get(maxDot)
-
-			// if (innerMap.has(MAP)) {
-			// 	value = ORMap.value([innerMap.get(MAP), cc])
-			// } else if (innerMap.has(ARRAY)) {
-			// 	value = ORArray.values([innerMap.get(ARRAY), cc])
-			// } else {
-			// 	value = MVReg.values([innerMap.get(VALUE), cc])
-			// }
+            
 			tmpArray.push([v, p])
         }
 
@@ -76,6 +60,51 @@ class ORArray {
 		const retDotMap = new DotMap(ORMap.typename(), new Map().set(ALIVE, retFun))
 
 		return [retDotMap, retCC]
+    }
+    
+    static applyToMap(uid, o, p, [m,cc]) {
+		const inner = function ([m,cc]) {return ORMap.apply(o, MAP, [m, cc])}
+		const [retMap, retCC] = ORArray.apply(uid, inner, p, [m,cc])
+
+		// Recommitted a map, delete the other two
+		if (m.get(uid) && m.get(uid).get(FIRST).get(ARRAY)) {
+			retCC.insertDots(m.get(uid).get(FIRST).get(ARRAY).dots())
+		}
+		if (m.get(uid) && m.get(uid).get(FIRST).get(VALUE)) {
+			retCC.insertDots(m.get(uid).get(FIRST).get(VALUE).dots())
+		}
+
+		return [retMap, retCC]
+    }
+    
+    static applyToArray(uid, o, p, [m,cc]) {
+        const inner = function ([m,cc]) {return ORMap.apply(o, ARRAY, [m, cc])}
+		const [retMap, retCC] = ORArray.apply(uid, inner, p, [m,cc])
+		
+        // Recommitted an array, delete the other two
+        if (m.get(uid) && m.get(uid).get(FIRST).get(MAP)) {
+			retCC.insertDots(m.get(uid).get(FIRST).get(ARRAY).dots())
+		}
+		if (m.get(uid) && m.get(uid).get(FIRST).get(VALUE)) {
+			retCC.insertDots(m.get(uid).get(FIRST).get(VALUE).dots())
+        }
+
+		return [retMap, retCC]
+    }
+    
+    static applyToValue(uid, o, p, [m,cc]) {
+        const inner = function ([m,cc]) {return ORMap.apply(o, VALUE, [m, cc])}
+		const [retMap, retCC] = ORArray.apply(uid, inner, p, [m,cc])
+		
+        // Recommitted a value, delete the other two
+        if (m.get(uid) && m.get(uid).get(FIRST).get(MAP)) {
+			retCC.insertDots(m.get(uid).get(FIRST).get(MAP).dots())
+		}
+		if (m.get(uid) && m.get(uid).get(FIRST).get(ARRAY)) {
+			retCC.insertDots(m.get(uid).get(FIRST).get(VALUE).dots())
+        }
+
+		return [retMap, retCC]
 	}
 
 	static insert(uid, o, p, [m,cc]) {
