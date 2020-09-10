@@ -40,8 +40,6 @@ class Backend {
 
     // joins a delta with the current state
     joinDelta(delta) {
-      // apply to current state
-      const delta = deltaMutator([this._state, this._cc])
       // update the current backend state
       this._state = this._joinFunction(this._state, delta)
     }
