@@ -26,7 +26,7 @@ class Backend {
     }
 
     getID() {
-        return this._id
+      return this._id
     }
 
     // applies a mutator on the current state and store it in the list of deltas
@@ -43,7 +43,7 @@ class Backend {
       // apply to current state
       const delta = deltaMutator([this._state, this._cc])
       // update the current backend state
-      this._state = this.joinFunction(this._state, delta)
+      this._state = this._joinFunction(this._state, delta)
     }
 
     resetDeltas() {
