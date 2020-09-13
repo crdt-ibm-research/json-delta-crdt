@@ -47,6 +47,25 @@ describe('orarray', () => {
 			orarray = DotMap.join(orarray, delta)
 			expect(ORArray.value(orarray)).to.deep.equal([])
 		})
+
+		it('can move', () => {
+			const writeA = function ([m,cc]) {	return MVReg.write("a", [m,cc])	}
+			const d1 = ORArray.insertValue("a", writeA, 0.5, orarray)
+			orarray = DotMap.join(orarray, d1)
+
+			const writeB = function ([m,cc]) {	return MVReg.write("b", [m,cc])	}
+			const d2 = ORArray.insertValue("b", writeB, 0.75, orarray)
+            orarray = DotMap.join(orarray, d2)
+
+			expect(ORArray.value(orarray)).to.deep.equal([new Set(["a"]), new Set(["b"])])
+
+			const d3 = ORArray.move("a", "0.8", orarray)
+			orarray = DotMap.join(orarray, d3)
+
+			expect(ORArray.value(orarray)).to.deep.equal([new Set(["b"]), new Set(["a"])])
+
+		})
+
 /*
 		it('can embed another ormap', () => {
 			const sub = ORMap.create

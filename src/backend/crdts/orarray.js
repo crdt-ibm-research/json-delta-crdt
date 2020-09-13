@@ -190,9 +190,10 @@ class ORArray {
         assert(cc instanceof CausalContext)
 
         const d = CausalContext.from(cc).next()
-        const children = m.get(uid).get(SECOND).values().reduce(function(a, b) {
-            new CausalContext().insertDots(a.dots()).join(new CausalContext().insertDots(b.dots()))
-        })
+        //const children = m.get(uid).get(SECOND).values().reduce(function(a, b) {
+        //    new CausalContext().insertDots(a.dots()).join(new CausalContext().insertDots(b.dots()))
+        //})
+        const children = m.get(uid).get(SECOND).dots()
 
         const ps = new DotFunMap()
         for (let r of m.get(uid).get(SECOND).keys()) {
@@ -206,7 +207,7 @@ class ORArray {
         const retDotMap = new DotMap(ORArray.typename(), new Map())
         retDotMap.set(uid, pair)
 
-        return [retDotMap, CausalContext.from(cc).insertDot(d, true).join(children)]
+        return [retDotMap, new CausalContext().insertDot(d, true).insertDots(children)]
 	}
 
 	static delete(uid, [m,cc]) {
