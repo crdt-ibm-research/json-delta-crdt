@@ -8,6 +8,7 @@ const { DotMap, DotFunMap, DotFun } = require('../dotstores/unifiedDotstores')
 //const DotMap = require('../dotstores/dot-map')
 //const DotFunMap = require('../dotstores/dot-fun-map')
 const { ALIVE, FIRST, SECOND, MAP, ARRAY, VALUE } = require('../constants')
+const Position = require('../position')
 
 class MVReg {
   static typename() {
@@ -179,7 +180,7 @@ class ORArray {
         assert(m instanceof DotMap)
         assert(cc instanceof CausalContext)
 
-        let tmpArray = []
+        const result = []
 		for (let [uid, pair] of m.state.entries()) {
             // get value
             if (uid === ALIVE) continue
@@ -198,12 +199,14 @@ class ORArray {
             const maxDot = pair.get(SECOND).get(maxRoot).keys().reduce(CausalContext.maxDot)
             const p = pair.get(SECOND).get(maxRoot).get(maxDot)
 
-			tmpArray.push([v, p])
+			result.push([v, p])
         }
+	
+		result.sort((a, b) => Position.compare(a[1], b[1]))
 
         // sort the array
         let retArray = []
-        for (let [v, p] of tmpArray.sort((a, b) => a[1] - b[1])) {
+        for (let [v, p] of result) {
             retArray.push(v)
         }
 

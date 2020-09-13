@@ -7,7 +7,7 @@ const Position = require("../position")
 const { assert } = require('chai');
 const { DotMap, DotFunMap, DotFun } = require('../dotstores/unifiedDotstores');
 const CausalContext = require("../causal-context");
-const { ALIVE } = require("../constants");
+const { ALIVE, FIRST, SECOND } = require("../constants");
 
 class JsonArray {
     static value(state) {
@@ -84,7 +84,7 @@ class JsonArray {
         return function([m,cc]) {
             const uid = _uidFromIndex([m, cc], from)
             const p = _createPositionForIndex([m, cc], to)
-            return ORArray.applyToValue(uid, o ,p, [m,cc])
+            return ORArray.move(uid, p, [m,cc])
         }
         return function([m,cc]) { return ORArray.move(uid,p, [m,cc]) }
     }
@@ -109,8 +109,8 @@ function _ids([m, cc]) {
 
     const result = []
     for (let [uid, pair] of m.state.entries()) {
-        // get value
         if (uid === ALIVE) continue
+        
         // get position
         const maxRoot = pair.get(SECOND).keys().reduce(CausalContext.maxDot)
         const maxDot = pair.get(SECOND).get(maxRoot).keys().reduce(CausalContext.maxDot)
@@ -118,7 +118,8 @@ function _ids([m, cc]) {
         result.push({"id" : uid, "positions" : p})
     }
 
-    result.sort((a, b) => Position.compare(a.positions[0], b.positions[0]))
+    result.sort((a, b) => Position.compare(a.positions, b.positions))
+
     return result
 }
 
@@ -128,8 +129,8 @@ function _createPositionForIndex(state, index) {
     if (ids.length === 0) {
         return Position.between(cc.getID())
     }
-    const posAtIndex = (index < l.length) ? l[index].positions[0] : undefined
-    const posAtPreviousIndex = (index > 0) ? l[index - 1].positions[0] : undefined
+    const posAtIndex = (index < ids.length) ? ids[index].positions[0] : undefined
+    const posAtPreviousIndex = (index > 0) ? ids[index - 1].positions[0] : undefined
     return Position.between(cc.getID(), posAtPreviousIndex, posAtIndex)
 }
 

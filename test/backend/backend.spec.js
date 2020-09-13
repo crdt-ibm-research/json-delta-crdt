@@ -7,12 +7,8 @@ const expect = chai.expect
 chai.use(dirtyChai)
 
 
-const DotMap = require('../../src/backend/dotstores/dot-map')
-const ORMap = require('../../src/backend/crdts/ormap')
-const CausalContext = require('../../src/backend/causal-context')
-const MVReg = require('../../src/backend/crdts/mvreg')
+
 const { VALUE } = require('../../src/backend/constants')
-const ORArray = require('../../src/backend/crdts/orarray')
 const JsonRegister = require('../../src/backend/JsonObjects/JsonRegister')
 const JsonMap = require('../../src/backend/JsonObjects/JsonMap')
 const JsonArray = require('../../src/backend/JsonObjects/JsonArray')
@@ -48,6 +44,41 @@ describe('backend', () => {
             expect(backend.getObject()).to.deep.equal({
                 "a" : [new Set(["b"])]
             })
+        })
+
+        it('can create a map', () => {
+            // doc.a = []
+            const createArray = JsonMap.create()
+            const insertArray = JsonMap.applyToMap(createArray, "m")
+            backend.applyMutator(insertArray)
+            expect(backend.getObject()).to.deep.equal({
+                "a" : [new Set(["b"])],
+                "m" : {}
+            })
+        })
+
+        it('can update array again', () => {
+            // doc.a.push("c")
+            const writeC = JsonRegister.write("c")
+            const insertToArray = JsonArray.insertValue(writeC, 1)
+            const updateKey = JsonMap.applyToArray(insertToArray, "a")
+            backend.applyMutator(updateKey)
+            console.log(backend.getObject().a)
+
+            expect(backend.getObject().a).to.deep.equal(
+                [new Set(["b"]), new Set(["c"])]
+            )
+        })
+
+        it('can update position in array', () => {
+            // doc.a.move(0 ,2)
+            const move = JsonArray.move(1, 2)
+            const updateKey = JsonMap.applyToArray(move, "a")
+            backend.applyMutator(updateKey)
+            console.log(backend.getObject().a)
+            expect(backend.getObject().a).to.deep.equal(
+                [new Set(["c"]), new Set(["b"])]
+            )
         })
 
 	})
