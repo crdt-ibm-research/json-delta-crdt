@@ -72,7 +72,7 @@ describe('backend', () => {
 
         it('can update position in array', () => {
             // doc.a.move(0 ,2)
-            const move = JsonArray.move(1, 2)
+            const move = JsonArray.move(0, 2)
             const updateKey = JsonMap.applyToArray(move, "a")
             backend.applyMutator(updateKey)
             console.log(backend.getObject().a)

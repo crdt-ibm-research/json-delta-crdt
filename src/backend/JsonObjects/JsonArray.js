@@ -110,7 +110,7 @@ function _ids([m, cc]) {
     const result = []
     for (let [uid, pair] of m.state.entries()) {
         if (uid === ALIVE) continue
-        
+
         // get position
         const maxRoot = pair.get(SECOND).keys().reduce(CausalContext.maxDot)
         const maxDot = pair.get(SECOND).get(maxRoot).keys().reduce(CausalContext.maxDot)
@@ -129,8 +129,8 @@ function _createPositionForIndex(state, index) {
     if (ids.length === 0) {
         return Position.between(cc.getID())
     }
-    const posAtIndex = (index < ids.length) ? ids[index].positions[0] : undefined
-    const posAtPreviousIndex = (index > 0) ? ids[index - 1].positions[0] : undefined
+    const posAtIndex = (index < ids.length) ? ids[index].positions : undefined
+    const posAtPreviousIndex = (index > 0) ? ids[index - 1].positions : undefined
     return Position.between(cc.getID(), posAtPreviousIndex, posAtIndex)
 }
 
