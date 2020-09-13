@@ -6,13 +6,15 @@ const dirtyChai = require('dirty-chai')
 const expect = chai.expect
 chai.use(dirtyChai)
 
-
-const DotMap = require('../../../src/backend/dotstores/dot-map')
-const ORMap = require('../../../src/backend/crdts/ormap')
+const {ORMap, ORArray, MVReg} = require('../../../src/backend/crdts/unifiedCRDTs')
+const {DotMap } = require('../../../src/backend/dotstores/unifiedDotstores')
+//const DotMap = require('../../../src/backend/dotstores/dot-map')
+//const ORMap = require('../../../src/backend/crdts/ormap')
 const CausalContext = require('../../../src/backend/causal-context')
-const MVReg = require('../../../src/backend/crdts/mvreg')
+//const MVReg = require('../../../src/backend/crdts/mvreg')
 const { VALUE } = require('../../../src/backend/constants')
-const ORArray = require('../../../src/backend/crdts/orarray')
+const Position = require('../../../src/backend/position')
+//const ORArray = require('../../../src/backend/crdts/orarray')
 
 describe('orarray', () => {
 	describe('local', () => {
@@ -28,7 +30,7 @@ describe('orarray', () => {
 
 		it('can apply a causal CRDT', () => {
 			const writeA = function ([m,cc]) {	return MVReg.write("a", [m,cc])	}
-            const d1 = ORArray.insertValue("a", writeA, 0.5, orarray)
+            const d1 = ORArray.insertValue("a", writeA, [["r1", 17]], orarray)
 
             orarray = DotMap.join(orarray, d1)
 			expect(ORArray.value(orarray)).to.deep.equal([new Set(["a"])])
@@ -36,7 +38,7 @@ describe('orarray', () => {
 
 		it('can apply a causal CRDT again', () => {
             const writeB = function ([m,cc]) {	return MVReg.write("b", [m,cc])	}
-            const d1 = ORArray.applyToValue("a", writeB, 0.5, orarray)
+            const d1 = ORArray.applyToValue("a", writeB, [["r1", 17]], orarray)
 
             orarray = DotMap.join(orarray, d1)
             expect(ORArray.value(orarray)).to.deep.equal([new Set(["b"])])
@@ -50,16 +52,19 @@ describe('orarray', () => {
 
 		it('can move', () => {
 			const writeA = function ([m,cc]) {	return MVReg.write("a", [m,cc])	}
-			const d1 = ORArray.insertValue("a", writeA, 0.5, orarray)
+			let p = new Position( [ [ 55, 'r1' ] ])
+			const d1 = ORArray.insertValue("a", writeA, p, orarray)
 			orarray = DotMap.join(orarray, d1)
 
 			const writeB = function ([m,cc]) {	return MVReg.write("b", [m,cc])	}
-			const d2 = ORArray.insertValue("b", writeB, 0.75, orarray)
+			p = new Position( [ [ 80, 'r1' ] ])
+			const d2 = ORArray.insertValue("b", writeB, p, orarray)
             orarray = DotMap.join(orarray, d2)
 
 			expect(ORArray.value(orarray)).to.deep.equal([new Set(["a"]), new Set(["b"])])
 
-			const d3 = ORArray.move("a", "0.8", orarray)
+			p = new Position( [ [ 150, 'r1' ] ])
+			const d3 = ORArray.move("a", p, orarray)
 			orarray = DotMap.join(orarray, d3)
 
 			expect(ORArray.value(orarray)).to.deep.equal([new Set(["b"]), new Set(["a"])])
