@@ -6,6 +6,7 @@ const DotMap = require('../dotstores/dot-map')
 const CausalContext = require('../causal-context')
 const MVReg = require('./mvreg')
 const { ALIVE, MAP, ARRAY, VALUE } = require('../constants')
+const ORArray = require('./orarray')
 
 class ORMap {
 	static typename() {
@@ -22,7 +23,7 @@ class ORMap {
 			if (innerMap.has(MAP)) {
 				value = ORMap.value([innerMap.get(MAP), cc])
 			} else if (innerMap.has(ARRAY)) {
-				value = ORArray.values([innerMap.get(ARRAY), cc])
+				value = ORArray.value([innerMap.get(ARRAY), cc])
 			} else {
 				value = MVReg.values([innerMap.get(VALUE), cc])
 			}

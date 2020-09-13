@@ -78,19 +78,20 @@ class DotFunMap {
         
         const type = left || right
         let joinFunction;
-        if (type instanceof DotMap) {
-          joinFunction = DotMap.join
-        }	else if (type instanceof DotFun) {
+
+        if (type instanceof DotFun) {
           joinFunction = DotFun.join
-        } else if (type instanceof DotFunMap) {
+        }	else if (type instanceof DotFunMap) {
           joinFunction = DotFunMap.join
+        } else {
+          joinFunction = DotMap.join
         }
 
         const res = joinFunction([left, cc1] , [right, cc2])
         const valueForKey = res[0]
 
         if (!valueForKey.isBottom()) {
-          resultDotStore.set(key, valueForKey)
+          resultDotStore.set(dot, valueForKey)
         }
       } else if (m1.has(dot) && !cc2.dotIn(dot)) {
         resultDotStore.set(dot, m1.get(dot))

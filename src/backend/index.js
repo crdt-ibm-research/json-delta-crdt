@@ -1,16 +1,22 @@
 'use strict'
 
 const uuid = require('./uuid')
+const { ORMap } = require('./crdts/unifiedCRDTs')
+
 const CausalContext = require('./causal-context')
-const DotFun = require('./dotstores/dot-fun')
-const DotFunMap = require('./dotstores/dot-fun-map')
-const DotMap = require('./dotstores/dot-map')
+
+const { DotMap, DotFunMap, DotFun } = require('./dotstores/unifiedDotstores')
+// const DotFun = require('./dotstores/dot-fun')
+// const DotFunMap = require('./dotstores/dot-fun-map')
+// const DotMap = require('./dotstores/dot-map')
+
+//const ORMap = require('./crdts/ormap')
 
 class Backend {
-    constructor(id, dotstore, type = 'json') {
+    constructor(id, dotstore, type = ORMap.typename()) {
       this._id = id || uuid() // the id of the backend to be used in the causal context
       // the state is (dotstore, cc)
-      this._state = [dotstore || new DotMap(type), CausalContext(this._id)]
+      this._state = [dotstore || new DotMap(type), new CausalContext(this._id)]
       // the changes
       this._deltas = [undefined,  new CausalContext()]
 
@@ -31,7 +37,7 @@ class Backend {
 
     // applies a mutator on the current state and store it in the list of deltas
     applyMutator(mutator) {
-      const delta = mutator([this._state, this._cc])
+      const delta = mutator(this._state)
       // add to current list of deltas
       this._deltas = this._joinFunction(this._deltas, delta)
       // update the current backend state
@@ -68,6 +74,8 @@ class Backend {
     }
 
     getObject() {
-      // get dot store value?
+      return ORMap.value(this._state)
     }
 }
+
+module.exports = Backend
