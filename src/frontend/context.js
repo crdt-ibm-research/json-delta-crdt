@@ -24,16 +24,16 @@ class Context {
     }
     */
     //const objectId = uuid()
-
     if (Array.isArray(value)) {
 
-    } else {
+        return [f, "array"]
+    } else if (isObject(value)){
       // Create a new map object
       let f = function ([m,cc]) {	
         let ormap = [new DotMap(ORMap.typename()), cc] 
         for (let key of Object.keys(value)) {
             console.log("val: ", value, " key: ", key, "val[key]: ", value[key])
-            const [currFunc, currType] = Context.genSetValue(value[key])
+            const [currFunc, currType] = Context.genNestedObjectCreation(value[key])
             let delta
             if (currType === 'primitive') {
                 delta = ORMap.applyToValue(currFunc, key, ormap)
@@ -47,8 +47,12 @@ class Context {
         return ormap
       }
       return [f, "map"]
+    } else {
+        const f = function ([m,cc]) {
+            return MVReg.write(value, [m,cc])
+        }
+        return [f, "primitive"]
     }
-
     return objectId
   }
 
