@@ -1,7 +1,8 @@
-const DotMap = require('../../src/backend/dotstores/dot-map')
-const ORMap = require('../../src/backend/crdts/ormap')
+const {DotMap, DotFun, DotFunMap} = require('../../src/backend/dotstores/unifiedDotstores')
+const {ORMap, ORArray, MVReg} = require('../../src/backend/crdts/unifiedCRDTs')
+
+const Position = require('../../src/backend/position')
 const CausalContext = require('../../src/backend/causal-context')
-const MVReg = require('../../src/backend/crdts/mvreg')
 const { VALUE } = require('../../src/backend/constants')
 
 class Context {
@@ -25,12 +26,32 @@ class Context {
     */
     //const objectId = uuid()
     if (Array.isArray(value)) {
-
+        let f = function ([m,cc]) {
+            // Create a new map object
+            let orarray = [new DotMap(ORArray.typename()), cc]
+            let replicaId = 'r1' //cc._id
+            let i
+            for (i  = 0;  i < value.length; i++) {
+                console.log("val: ", value, " index: ", i, "val[key]: ", value[i])
+                const [currFunc, currType] = Context.genNestedObjectCreation(value[i])
+                let delta
+                if (currType === 'primitive') {
+                    // p = new Position( [ [ 150, 'r1' ] ])
+                    delta = ORArray.insertValue([replicaId, i+1], currFunc, new Position([[i, replicaId]]), orarray)
+                } else if (currType === "map") {
+                    delta = ORArray.insertMap([replicaId, i+1], currFunc, new Position([[i, replicaId]]), orarray)
+                } else if (currType === "array") {
+                    delta = ORArray.insertArray([replicaId, i+1], currFunc, new Position([[i, replicaId]]), orarray)
+                }
+                orarray = DotMap.join(orarray, delta)
+            }
+            return orarray
+        }
         return [f, "array"]
     } else if (isObject(value)){
-      // Create a new map object
-      let f = function ([m,cc]) {	
-        let ormap = [new DotMap(ORMap.typename()), cc] 
+      let f = function ([m,cc]) {
+        // Create a new map object
+        let ormap = [new DotMap(ORMap.typename()), cc]
         for (let key of Object.keys(value)) {
             console.log("val: ", value, " key: ", key, "val[key]: ", value[key])
             const [currFunc, currType] = Context.genNestedObjectCreation(value[key])
@@ -48,11 +69,14 @@ class Context {
       }
       return [f, "map"]
     } else {
+        console.log("primitive")
         const f = function ([m,cc]) {
             return MVReg.write(value, [m,cc])
         }
         return [f, "primitive"]
     }
+
+    console.log("zin ba-eyein")
     return objectId
   }
 
