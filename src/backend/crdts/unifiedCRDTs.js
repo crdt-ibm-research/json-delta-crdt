@@ -15,6 +15,10 @@ class MVReg {
     return "mvreg"
   }
 
+  getTypeName() {
+  	return MVReg.typename()
+  }
+
   static values([m, c]) {
     const ret = new Set()
     for (let [, value] of m.items()) {
@@ -49,10 +53,28 @@ class ORMap {
 		return "or-map"
 	}
 
-	static value([m, cc]) {
+	getTypeName() {
+		return ORMap.typename()
+	}
+
+	static getKey(m, key) {
+		//console.log("m: ", ORMap.value([m, cc]))
+		const innerMap = m.get(key)
+		if (innerMap.has(MAP)) {
+			return [innerMap.get(MAP), MAP]
+		} else if (innerMap.has(ARRAY)) {
+			return [innerMap.get(ARRAY), ARRAY]
+		} else {
+			return [innerMap.get(VALUE), VALUE]
+		}
+	}
+
+	static value(target) {
+		const [m, cc] = target
 		assert(m instanceof DotMap)
 
 		let retMap = {}
+
 		for (let [key, value] of m.state.entries()) {
 			if (key === ALIVE) continue
 			const innerMap = m.get(key)
@@ -174,6 +196,10 @@ class ORMap {
 class ORArray {
 	static typename() {
 		return "or-array"
+	}
+
+	getTypeName() {
+		return ORArray.typename()
 	}
 
 	static value([m, cc]) {

@@ -5,7 +5,7 @@ const Position = require('../../src/backend/position')
 const CausalContext = require('../../src/backend/causal-context')
 const { VALUE } = require('../../src/backend/constants')
 
-class Context {
+class Peeler {
     constructor() {
         // maps UUID to (parent-uuid, parent-type, my-identifier-in-parent)
         this.backtrackMap = new Map()
@@ -33,7 +33,7 @@ class Context {
             let i
             for (i  = 0;  i < value.length; i++) {
                 console.log("val: ", value, " index: ", i, "val[key]: ", value[i])
-                const [currFunc, currType] = Context.genNestedObjectCreation(value[i])
+                const [currFunc, currType] = Peeler.genNestedObjectCreation(value[i])
                 let delta
                 if (currType === 'primitive') {
                     // p = new Position( [ [ 150, 'r1' ] ])
@@ -54,7 +54,7 @@ class Context {
         let ormap = [new DotMap(ORMap.typename()), cc]
         for (let key of Object.keys(value)) {
             console.log("val: ", value, " key: ", key, "val[key]: ", value[key])
-            const [currFunc, currType] = Context.genNestedObjectCreation(value[key])
+            const [currFunc, currType] = Peeler.genNestedObjectCreation(value[key])
             let delta
             if (currType === 'primitive') {
                 delta = ORMap.applyToValue(currFunc, key, ormap)
@@ -85,7 +85,7 @@ class Context {
       console.log(isObject(value))
       if (isObject(value)) {
           // another nesting, get the creation func
-          return Context.genNestedObjectCreation(value)
+          return Peeler.genNestedObjectCreation(value)
       } else {
           // we have a primitive
           const f = function ([m,cc]) {
@@ -100,4 +100,4 @@ function isObject(obj) {
     return typeof obj === 'object' && obj !== null
 }
 
-module.exports = Context
+module.exports = Peeler

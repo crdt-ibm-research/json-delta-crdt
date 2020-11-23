@@ -207,6 +207,10 @@ class DotMap {
 		return this.state.has(key)
 	}
 
+    getKeys() {
+        return this.state.keys()
+    }
+
 	get(key) {
 		return this.state.get(key)
 	}
