@@ -51,34 +51,19 @@ describe('check frontend ', () => {
 		let ormap
 		it('check proxy 1', () => {
 			ormap = [new DotMap(ORMap.typename()), new CausalContext("r1")]
-			let rootProxy = Proxies.createRootObjectProxy(ormap)
+			let context = {}
+			context.doc = ormap
+			let rootProxy = Proxies.createRootObjectProxy(context)
 			let callback = doc => {
 				doc.a = {"b": { "c": 7 }}
-				//console.log("after first set, proxy", doc)
-				//console.log("after first set, doc.a", doc.a)
-				//doc.a.b.c = 5
-				//doc.a.b = {"hi": "bye"}
+				doc.a.b.c = 5
+				doc.a.b = {"hi": "bye"}
 			}
 			callback(rootProxy)
-			let itr = Object.getOwnPropertyNames(rootProxy)
-			console.log("itr: ", itr)
-			for (const key of itr) {
-				console.log("loop, key: ", key)
-			}
+			expect(ORMap.value(context.doc)).to.deep.equal(
 
-			//console.log("after callback, ormap:", ormap)
-			//console.log("after callback, rootProxy.a", rootProxy.a)
-			//console.log("after callback, ORMap.value(rootProxy.a):", ORMap.value(rootProxy.a))
-			expect(ORMap.value(rootProxy.a)).to.deep.equal(
-
-				{"b": {"c": new Set([7])} }
+				{"a": {"b": {"hi": new Set(["bye"])} }}
 			)
-			/*
-			expect(ORMap.value(ormap)).to.deep.equal(
-
-				{"a": {"b": {"hi": new Set("bye")} } }
-			)
-			*/
 		})
 	})
 })

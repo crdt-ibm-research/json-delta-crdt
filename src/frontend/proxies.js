@@ -36,7 +36,7 @@ const MapHandler = {
                     return ORMap.applyToMap(f, key, [m, cc])
                 }
             })
-            return mapProxy(context, val, mutatorsList)
+            return mapProxy(context, val, mutatorsList, false)
         } else if (type === ARRAY) {
             throw new Error("not implemented yet")
         } else if (type === VALUE) {
@@ -148,7 +148,7 @@ const MapHandler = {
 
 
 /**
- * @param context: a reference to [m, cc]
+ * @param context: a reference to doc (which is [m, cc] of the top level)
  * @param wrappedObject: The object actually wrapped by the proxy (the actual map)
  * @param mutatorsList: list of delta operations from top to current level
  * @param isRoot: boolean, determine if this proxy is the root proxy
@@ -163,11 +163,11 @@ function MVRProxy(context, wrappedObject, mutatorsList) {
     return new Proxy({context, wrappedObject, mutatorsList}, MVRHandler)
 }
 
-function createRootObjectProxy(doc) {
-    let context = {}
-    context.doc = doc
+// @param context: a reference to [m, cc]
+function createRootObjectProxy(context) {
     const mutatorList = new Array()
-    return mapProxy(context, doc, mutatorList, true)
+    let [m, cc] = context.doc
+    return mapProxy(context, m, mutatorList, true)
 }
 
 /**
