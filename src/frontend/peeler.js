@@ -1,6 +1,7 @@
 const {DotMap, DotFun, DotFunMap} = require('../../src/backend/dotstores/unifiedDotstores')
 const {ORMap, ORArray, MVReg} = require('../../src/backend/crdts/unifiedCRDTs')
-
+const JsonArray = require('../../src/backend/JsonObjects/JsonArray')
+const JsonMap = require('../../src/backend/JsonObjects/JsonMap')
 const Position = require('../../src/backend/position')
 const CausalContext = require('../../src/backend/causal-context')
 const { VALUE } = require('../../src/backend/constants')
@@ -28,21 +29,30 @@ class Peeler {
     if (Array.isArray(value)) {
         let f = function ([m,cc]) {
             // Create a new map object
+            let newCC = CausalContext.from(cc)
+            let deltaArray = ORArray.create([null, newCC])
             let orarray = [new DotMap(ORArray.typename()), cc]
+            orarray = DotMap.join(orarray, deltaArray)
+
+            
             let replicaId = 'r1' //cc._id
             let i
             for (i  = 0;  i < value.length; i++) {
                 console.log("val: ", value, " index: ", i, "val[key]: ", value[i])
                 const [currFunc, currType] = Peeler.genNestedObjectCreation(value[i])
-                let delta
+                let deltaMutator, delta
                 if (currType === 'primitive') {
                     // p = new Position( [ [ 150, 'r1' ] ])
-                    delta = ORArray.insertValue([replicaId, i+1], currFunc, new Position([[i, replicaId]]), orarray)
+                    //delta = ORArray.insertValue([replicaId, i+1], currFunc, new Position([[i, replicaId]]), orarray)
+                    deltaMutator = JsonArray.insertValue(currFunc, i)
                 } else if (currType === "map") {
-                    delta = ORArray.insertMap([replicaId, i+1], currFunc, new Position([[i, replicaId]]), orarray)
+                    deltaMutator = JsonArray.insertMap(currFunc, i)
+                    //delta = ORArray.insertMap([replicaId, i+1], currFunc, new Position([[i, replicaId]]), orarray)
                 } else if (currType === "array") {
-                    delta = ORArray.insertArray([replicaId, i+1], currFunc, new Position([[i, replicaId]]), orarray)
+                    deltaMutator = JsonArray.insertArray(currFunc, i)
+                    //delta = ORArray.insertArray([replicaId, i+1], currFunc, new Position([[i, replicaId]]), orarray)
                 }
+                delta = deltaMutator(orarray)
                 orarray = DotMap.join(orarray, delta)
             }
             return orarray
@@ -51,25 +61,44 @@ class Peeler {
     } else if (isObject(value)){
       let f = function ([m,cc]) {
         // Create a new map object
-        let ormap = [new DotMap(ORMap.typename()), cc]
+        let newCC = CausalContext.from(cc)
+        let ormap = [new DotMap(ORMap.typename()), newCC]
+
+        let deltaMap = ORMap.create([null, newCC])
+        ormap = DotMap.join(ormap, deltaMap)
+
         for (let key of Object.keys(value)) {
-            console.log("val: ", value, " key: ", key, "val[key]: ", value[key])
+            //console.log("Adding key:", key)
+            //console.log("Adding value:", value[key])
             const [currFunc, currType] = Peeler.genNestedObjectCreation(value[key])
-            let delta
+            let deltaMutator, delta
             if (currType === 'primitive') {
-                delta = ORMap.applyToValue(currFunc, key, ormap)
+                deltaMutator = JsonMap.applyToValue(currFunc, key)
+                //delta = ORMap.applyToValue(currFunc, key, ormap)
             } else if (currType === "map") {
-                delta = ORMap.applyToMap(currFunc, key, ormap)
+                deltaMutator = JsonMap.applyToMap(currFunc, key)
+
+                //delta = ORMap.applyToMap(currFunc, key, ormap)
             } else if (currType === "array") {
-                delta = ORMap.applyToArray(currFunc, key, ormap)
+                deltaMutator = JsonMap.applyToArray(currFunc, key)
+
+                //delta = ORMap.applyToArray(currFunc, key, ormap)
             }
+
+            delta = deltaMutator(ormap)
+            //console.log("Before delta:", delta)
+
+            //console.log("ormap:", ormap[1])
+            //console.log("delta:", delta[1])
             ormap = DotMap.join(ormap, delta)
+            //console.log("After:", ormap)
+
         }
+        //console.log("Final:", ormap)
         return ormap
       }
       return [f, "map"]
     } else {
-        console.log("primitive")
         const f = function ([m,cc]) {
             return MVReg.write(value, [m,cc])
         }

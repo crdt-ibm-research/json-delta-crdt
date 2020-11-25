@@ -18,12 +18,22 @@ describe('check frontend ', () => {
 	describe('check nesting map', () => {
 		let ormap
 
+		it('check empty nesting', () => {
+			ormap = ORMap.create([null, new CausalContext("r1")])//[new DotMap(ORMap.typename()), new CausalContext("r1")]
+			let [f, _] = Peeler.genNestedObjectCreation({ })
+			let delta = ORMap.applyToMap(f, "content", ormap)
+			ormap = DotMap.join(ormap, delta)
+			expect(ORMap.value(ormap)).to.deep.equal(
+				
+				{"content": { } }
+			)
+		})
+
 		it('check nesting 1', () => {
-            ormap = [new DotMap(ORMap.typename()), new CausalContext("r1")]
+			ormap = ORMap.create([null, new CausalContext("r1")])//[new DotMap(ORMap.typename()), new CausalContext("r1")]
 			let [f, _] = Peeler.genNestedObjectCreation({"hello": {"name": "2"}})
-            let delta = ORMap.applyToMap(f, "content", ormap)
-            ormap = DotMap.join(ormap, delta)
-			console.log(ormap)
+			let delta = ORMap.applyToMap(f, "content", ormap)
+			ormap = DotMap.join(ormap, delta)
 			expect(ORMap.value(ormap)).to.deep.equal(
 				
 				{"content": {"hello": {"name": new Set("2")}}}
@@ -31,9 +41,24 @@ describe('check frontend ', () => {
 		})
 	})
 
+	describe('check empty array', () => {
+		let ormap
+		it('check nesting 2', () => {
+			ormap = [new DotMap(ORMap.typename()), new CausalContext("r1")]
+			let [f, _] = Peeler.genNestedObjectCreation([ ])
+			let delta = ORMap.applyToArray(f, "content", ormap)
+			ormap = DotMap.join(ormap, delta)
+			console.log(ORMap.value(ormap))
+			expect(ORMap.value(ormap)).to.deep.equal(
+
+				{"content": [ ] }
+			)
+		})
+	})
+
 	describe('check array in map', () => {
 		let ormap
-		it('check nesting 1', () => {
+		it('check nesting 2', () => {
 			ormap = [new DotMap(ORMap.typename()), new CausalContext("r1")]
 			let [f, _] = Peeler.genNestedObjectCreation([1, 2, 3])
 			let delta = ORMap.applyToArray(f, "content", ormap)
@@ -45,7 +70,7 @@ describe('check frontend ', () => {
 			)
 		})
 	})
-
+/*
 
 	describe('check proxy', () => {
 		let ormap
@@ -66,4 +91,5 @@ describe('check frontend ', () => {
 			)
 		})
 	})
+	*/
 })

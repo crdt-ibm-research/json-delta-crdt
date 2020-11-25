@@ -35,11 +35,13 @@ class MVReg {
   }
 
   static write(value, [m, c]) {
+
+	assert (c instanceof CausalContext)
     // handle undefined
     m = m || new DotFun(MVReg.typename())
     const dot = c.next()
     const newState = new DotFun(m.typename).set(dot, value)
-    const newCC = new CausalContext().insertDot(dot).insertDots(m.dots())
+    const newCC = new CausalContext(c.getID()).insertDot(dot).insertDots(m.dots())
     return [newState, newCC]
   }
 
@@ -106,7 +108,6 @@ class ORMap {
 	static applyToMap(o, k, [m,cc]) {
 		const inner = function ([m,cc]) {return ORMap.apply(o, MAP, [m, cc])}
 		const [retMap, retCC] = ORMap.apply(inner, k, [m,cc])
-
 		// Recommitted a map, delete the other two
 		if (m.get(k) && m.get(k).get(ARRAY)) {
 			retCC.insertDots(m.get(k).get(ARRAY).dots())
@@ -114,7 +115,6 @@ class ORMap {
 		if (m.get(k) && m.get(k).get(VALUE)) {
 			retCC.insertDots(m.get(k).get(VALUE).dots())
 		}
-
 		return [retMap, retCC]
 	}
 
@@ -155,10 +155,12 @@ class ORMap {
 		assert(m.typename === ORMap.typename())
 		assert(cc instanceof CausalContext)
 
+		const tmpCC = CausalContext.from(cc)
+
 		const retDotMap = new DotMap(ORMap.typename())
 
 		// First add ALIVE
-		const [fun, funCC] = MVReg.write(true, [m.get(ALIVE), cc])
+		const [fun, funCC] = MVReg.write(true, [m.get(ALIVE), tmpCC])
 		retDotMap.set(ALIVE, fun)
 
 		// Next call o (don't forget to add the dot to the CC)

@@ -6,8 +6,6 @@ const dirtyChai = require('dirty-chai')
 const expect = chai.expect
 chai.use(dirtyChai)
 
-
-
 const { VALUE } = require('../../src/backend/constants')
 const JsonRegister = require('../../src/backend/JsonObjects/JsonRegister')
 const JsonMap = require('../../src/backend/JsonObjects/JsonMap')
