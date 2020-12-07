@@ -48,7 +48,7 @@ describe('check frontend ', () => {
 			let [f, _] = Peeler.genNestedObjectCreation([ ])
 			let delta = ORMap.applyToArray(f, "content", ormap)
 			ormap = DotMap.join(ormap, delta)
-			console.log(ORMap.value(ormap))
+			//console.log(ORMap.value(ormap))
 			expect(ORMap.value(ormap)).to.deep.equal(
 
 				{"content": [ ] }
@@ -63,14 +63,32 @@ describe('check frontend ', () => {
 			let [f, _] = Peeler.genNestedObjectCreation([1, 2, 3])
 			let delta = ORMap.applyToArray(f, "content", ormap)
 			ormap = DotMap.join(ormap, delta)
-			console.log(ORMap.value(ormap))
+			//console.log(ORMap.value(ormap))
 			expect(ORMap.value(ormap)).to.deep.equal(
 
 				{"content": [new Set([1]), new Set([2]), new Set([3])] }
 			)
 		})
 	})
-/*
+
+
+	describe('check empty proxy', () => {
+		let ormap
+		it('check proxy 1', () => {
+			let cc = new CausalContext("r1")
+			ormap = [new DotMap(ORMap.typename()), cc]
+            let deltaMap = ORMap.create([null, cc])
+            ormap = DotMap.join(ormap, deltaMap)
+
+			let context = {}
+			context.doc = ormap
+			let rootProxy = Proxies.createRootObjectProxy(context)
+
+			expect(ORMap.value(context.doc)).to.deep.equal(
+				{ }
+			)
+		})
+	})
 
 	describe('check proxy', () => {
 		let ormap
@@ -89,7 +107,24 @@ describe('check frontend ', () => {
 
 				{"a": {"b": {"hi": new Set(["bye"])} }}
 			)
+		}),
+		it('check proxy 1', () => {
+			ormap = [new DotMap(ORMap.typename()), new CausalContext("r1")]
+			let context = {}
+			context.doc = ormap
+			let rootProxy = Proxies.createRootObjectProxy(context)
+			let callback = doc => {
+				doc.a = {"b": { "c": 7 }}
+				doc.a.b.c = 5
+				doc.a.b = {"hi": "bye"}
+			}
+			callback(rootProxy)
+			expect(ORMap.value(context.doc)).to.deep.equal(
+
+				{"a": {"b": {"hi": new Set(["bye"])} }}
+			)
 		})
 	})
-	*/
+
+
 })

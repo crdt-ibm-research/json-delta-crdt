@@ -2,6 +2,8 @@ const {DotMap, DotFun, DotFunMap} = require('../../src/backend/dotstores/unified
 const {ORMap, ORArray, MVReg} = require('../../src/backend/crdts/unifiedCRDTs')
 const JsonArray = require('../../src/backend/JsonObjects/JsonArray')
 const JsonMap = require('../../src/backend/JsonObjects/JsonMap')
+const JsonRegister = require('../../src/backend/JsonObjects/JsonRegister')
+
 const Position = require('../../src/backend/position')
 const CausalContext = require('../../src/backend/causal-context')
 const { VALUE } = require('../../src/backend/constants')
@@ -38,7 +40,7 @@ class Peeler {
             let replicaId = 'r1' //cc._id
             let i
             for (i  = 0;  i < value.length; i++) {
-                console.log("val: ", value, " index: ", i, "val[key]: ", value[i])
+                //console.log("val: ", value, " index: ", i, "val[key]: ", value[i])
                 const [currFunc, currType] = Peeler.genNestedObjectCreation(value[i])
                 let deltaMutator, delta
                 if (currType === 'primitive') {
@@ -99,10 +101,7 @@ class Peeler {
       }
       return [f, "map"]
     } else {
-        const f = function ([m,cc]) {
-            return MVReg.write(value, [m,cc])
-        }
-        return [f, "primitive"]
+        return [JsonRegister.write(value), "primitive"]
     }
 
     console.log("zin ba-eyein")
@@ -110,8 +109,8 @@ class Peeler {
   }
 
   static genSetValue(value) {
-    console.log(value)
-      console.log(isObject(value))
+    //console.log(value)
+    //console.log(isObject(value))
       if (isObject(value)) {
           // another nesting, get the creation func
           return Peeler.genNestedObjectCreation(value)

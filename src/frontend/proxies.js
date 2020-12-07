@@ -4,6 +4,10 @@ const CausalContext = require('../backend/causal-context')
 const Peeler = require('./peeler')
 const { MAP, ARRAY, VALUE } = require('../../src/backend/constants')
 
+const JsonArray = require('../../src/backend/JsonObjects/JsonArray')
+const JsonMap = require('../../src/backend/JsonObjects/JsonMap')
+const JsonRegister = require('../../src/backend/JsonObjects/JsonRegister')
+
 const MVRHandler = {}
 
 /*
@@ -32,19 +36,25 @@ const MapHandler = {
         let [val, type] = ORMap.getKey(wrappedObject, key)
         if (type === MAP) {
             mutatorsList.push(function (f) {
+                return JsonMap.applyToMap(f, key)
+            })
+            /* mutatorsList.push(function (f) {
                 return function ([m, cc]) {
                     return ORMap.applyToMap(f, key, [m, cc])
                 }
-            })
+            }) */
             return mapProxy(context, val, mutatorsList, false)
         } else if (type === ARRAY) {
             throw new Error("not implemented yet")
         } else if (type === VALUE) {
             mutatorsList.push(function (f) {
+                return JsonMap.applyToValue(f, key)
+            })
+            /* mutatorsList.push(function (f) {
                 return function ([m, cc]) {
                     return ORMap.applyToValue(f, key, [m, cc])
                 }
-            })
+            }) */
             return MVRProxy(context, val, mutatorsList)
         } else {
             throw new Error("Type not specified")
@@ -57,18 +67,25 @@ const MapHandler = {
         //console.log("mutator: ", mutator)
         if (type === "map") {
             mutatorsList.push(function (f) {
+                return JsonMap.applyToMap(f, key)
+            })
+            /* mutatorsList.push(function (f) {
                 return function ([m, cc]) {
                     return ORMap.applyToMap(f, key, [m, cc])
                 }
-            })
+            }) */
         }  else if (type === "array") {
             throw new Error("not implemented yet")
         } else if (type === "primitive") {
             mutatorsList.push(function (f) {
+                return JsonMap.applyToValue(f, key)
+            })
+            /* mutatorsList.push(function (f) {
                 return function ([m, cc]) {
                     return ORMap.applyToValue(f, key, [m, cc])
                 }
-            })
+            }) */
+
         }
         let i
         for (i  = mutatorsList.length - 1;  i >= 0; i--) {
