@@ -217,7 +217,7 @@ class ORArray {
             if (innerMap.has(MAP)) {
 				v = ORMap.value([innerMap.get(MAP), cc])
 			} else if (innerMap.has(ARRAY)) {
-				v = ORArray.values([innerMap.get(ARRAY), cc])
+				v = ORArray.value([innerMap.get(ARRAY), cc])
 			} else {
 				v = MVReg.values([innerMap.get(VALUE), cc])
             }

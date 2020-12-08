@@ -126,5 +126,49 @@ describe('check frontend ', () => {
 		})
 	})
 
+	describe('check array proxy', () => {
+		let ormap
+		it('check init empty array', () => {
+			ormap = [new DotMap(ORMap.typename()), new CausalContext("r1")]
+			let context = {}
+			context.doc = ormap
+			let rootProxy = Proxies.createRootObjectProxy(context)
+			let callback = doc => {
+				doc.a = []
+				doc.a[0] = 1
+			}
+			callback(rootProxy)
+			expect(ORMap.value(context.doc)).to.deep.equal(
+
+				{"a": [new Set([1])] }
+			)
+		}),
+
+		it('check add a value', () => {
+			ormap = [new DotMap(ORMap.typename()), new CausalContext("r1")]
+			let context = {}
+			context.doc = ormap
+			let rootProxy = Proxies.createRootObjectProxy(context)
+			let callback = doc => {
+				doc.a = []
+				doc.a[0] = 1
+			}
+
+			callback(rootProxy)
+			expect(ORMap.value(context.doc)).to.deep.equal(
+				{"a": [new Set([1]) ] }
+			)
+
+			callback = doc => {
+				doc.a[0] = 2
+			}
+			callback(rootProxy)
+			expect(ORMap.value(context.doc)).to.deep.equal(
+
+				{"a": [ new Set([2]) ] }
+			)
+
+		})
+	})
 
 })
