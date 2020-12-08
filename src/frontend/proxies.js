@@ -22,7 +22,7 @@ const MVRHandler = {}
 // context = {doc: [m, cc] } where m is the top level document
 const MapHandler = {
     get (target, key) {
-        console.log("key: ", key)
+        //console.log("key: ", key)
         let { context, wrappedObject, mutatorsList, isRoot } = target
         //console.log("wrappedObject: ", wrappedObject)
         //console.log("wrappedObject values: ", ORMap.value(wrappedObject))
@@ -73,6 +73,10 @@ const MapHandler = {
         const { context, wrappedObject, mutatorsList, isRoot } = target
         let [mutator, type] = Peeler.genNestedObjectCreation(value)
         //console.log("mutator: ", mutator)
+        // console.log("key:" , key)
+        // console.log("type:" , type)
+        // console.log("mutator:" , mutator.toString())
+
         if (type === "map") {
             mutatorsList.push(function (f) {
                 return JsonMap.applyToMap(f, key)
@@ -107,7 +111,7 @@ const MapHandler = {
         //console.log("Set: delta: ", ORMap.value(delta))
         context.doc = DotMap.join(doc, delta)
         //console.log("Set: after join, context.doc: ", ORMap.value(context.doc))
-        console.log("finished set")
+        // console.log("finished set")
         return true
     },
     //
@@ -187,7 +191,7 @@ const ListHandler = {
             mutatorsList = new Array()
         }
 
-        let [val, type] = ORMap.getKey(wrappedObject, key)
+        let [val, type] = ORArray.getIdx(wrappedObject, prop)
         if (type === MAP) {
             mutatorsList.push(function (f) {
                 return JsonArray.applyToMap(f, prop)
@@ -225,7 +229,7 @@ const ListHandler = {
 
         const { context, wrappedObject, mutatorsList, isRoot } = target
 
-        console.log("Before context.doc:", context.doc)
+        //console.log("Before context.doc:", context.doc)
         //console.log("prop:", prop)
 
         let [mutator, type] = Peeler.genNestedObjectCreation(value)
@@ -266,11 +270,11 @@ const ListHandler = {
         //console.log("Set: delta: ", ORMap.value(delta))
         context.doc = DotMap.join(doc, delta)
 
-        console.log("After context.doc:", context.doc)
+        //console.log("After context.doc:", context.doc)
         //console.log("prop:", prop)
 
         //console.log("Set: after join, context.doc: ", ORMap.value(context.doc))
-        console.log("finished set")
+        //console.log("finished set")
         return true
     },
     //

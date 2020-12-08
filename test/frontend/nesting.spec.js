@@ -171,4 +171,67 @@ describe('check frontend ', () => {
 		})
 	})
 
+	describe('check nesting', () => {
+		let ormap = [new DotMap(ORMap.typename()), new CausalContext("r1")]
+		let context = { doc : ormap }
+		// context.doc = ormap
+		let rootProxy = Proxies.createRootObjectProxy(context)
+
+		it('map in map', () => {
+			let callback = doc => {
+				doc.map = {}
+				doc.map.map =  {}
+				doc.map.map.key  = 1
+			}
+			callback(rootProxy)
+			expect(ORMap.value(context.doc).map).to.deep.equal(
+				{ "map" : { "key" : new Set([1]) } }
+			)
+		})
+
+		it('array in map', () => {
+			let callback = doc => {
+				doc.map = {}
+				doc.map.array =  [ ]
+				doc.map.array[0]  = 1
+			}
+			callback(rootProxy)
+
+			expect(ORMap.value(context.doc).map).to.deep.equal(
+				{ "array" : [new Set([1])] }
+			)
+		})
+
+		it('array in array', () => {
+			let callback = doc => {
+				doc.map = { }
+				doc.map.array= [ ]
+				doc.map.array[0] =  [ ]
+				doc.map.array[0][0]  = 1
+			}
+			callback(rootProxy)
+
+			expect(ORMap.value(context.doc).map).to.deep.equal(
+				//{ "array" : [ [ ] ] }
+				{ "array" : [ [ new Set([1]) ] ] }
+			)
+		})
+
+		it('map in array', () => {
+			let callback = doc => {
+				doc.map = { }
+				doc.map.array= [ ]
+				doc.map.array[0] =  { }
+				doc.map.array[0].a  = 1
+			}
+			callback(rootProxy)
+
+			expect(ORMap.value(context.doc).map).to.deep.equal(
+				//{ "array" : [ [ ] ] }
+				{ "array" : [ { "a" : new Set([1]) }  ] }
+			)
+		})
+
+	})
+
 })

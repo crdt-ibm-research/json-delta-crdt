@@ -60,7 +60,6 @@ class ORMap {
 	}
 
 	static getKey(m, key) {
-		//console.log("m: ", ORMap.value([m, cc]))
 		const innerMap = m.get(key)
 		if (innerMap.has(MAP)) {
 			return [innerMap.get(MAP), MAP]
@@ -109,10 +108,10 @@ class ORMap {
 		const inner = function ([m,cc]) {return ORMap.apply(o, MAP, [m, cc])}
 		const [retMap, retCC] = ORMap.apply(inner, k, [m,cc])
 		// Recommitted a map, delete the other two
-		if (m.get(k) && m.get(k).get(ARRAY)) {
+		if (m && m.get(k) && m.get(k).get(ARRAY)) {
 			retCC.insertDots(m.get(k).get(ARRAY).dots())
 		}
-		if (m.get(k) && m.get(k).get(VALUE)) {
+		if (m && m.get(k) && m.get(k).get(VALUE)) {
 			retCC.insertDots(m.get(k).get(VALUE).dots())
 		}
 		return [retMap, retCC]
@@ -123,10 +122,10 @@ class ORMap {
 		const [retMap, retCC] = ORMap.apply(inner, k, [m,cc])
 		
 	    // Recommitted an array, delete the other two
-		if (m.get(k) && m.get(k).get(MAP)) {
+		if (m && m.get(k) && m.get(k).get(MAP)) {
 			retCC.insertDots(m.get(k).get(MAP).dots())
 		}
-		if (m.get(k) && m.get(k).get(VALUE)) {
+		if (m && m.get(k) && m.get(k).get(VALUE)) {
 			retCC.insertDots(m.get(k).get(VALUE).dots())
 		}
 
@@ -138,10 +137,10 @@ class ORMap {
 		const [retMap, retCC] = ORMap.apply(inner, k, [m,cc])
 		
 		// Recommitted a value, delete the other two
-		if (m.get(k) && m.get(k).has(MAP)) {
+		if (m && m.get(k) && m.get(k).has(MAP)) {
 			retCC.insertDots(m.get(k).get(MAP).dots())
 		}
-		if (m.get(k) && m.get(k).has(ARRAY)) {
+		if (m && m.get(k) && m.get(k).has(ARRAY)) {
 			retCC.insertDots(m.get(k).get(ARRAY).dots())
 		}
 
@@ -202,6 +201,40 @@ class ORArray {
 
 	getTypeName() {
 		return ORArray.typename()
+	}
+
+	static getIdx(m, idx) {
+		const result = []
+		for (let [uid, pair] of m.state.entries()) {
+            // get value
+			if (uid === ALIVE) continue
+            const innerMap = pair.get(FIRST)
+            let v
+            if (innerMap.has(MAP)) {
+				v = [innerMap.get(MAP), MAP]
+			} else if (innerMap.has(ARRAY)) {
+				v = [innerMap.get(ARRAY), ARRAY]
+			} else {
+				v = [innerMap.get(VALUE), VALUE]
+            }
+
+            // get position
+            const maxRoot = pair.get(SECOND).keys().reduce(CausalContext.maxDot)
+            const maxDot = pair.get(SECOND).get(maxRoot).keys().reduce(CausalContext.maxDot)
+            const p = pair.get(SECOND).get(maxRoot).get(maxDot)
+
+			result.push([v, p])
+        }
+	
+		result.sort((a, b) => Position.compare(a[1], b[1]))
+
+        // sort the array
+        let retArray = []
+        for (let [v, p] of result) {
+            retArray.push(v)
+        }
+
+		return retArray[idx]
 	}
 
 	static value([m, cc]) {
