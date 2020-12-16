@@ -31,6 +31,10 @@ class Backend {
       this._joinFunction = joinFunction
     }
 
+    setState(newState) {
+      this._state = newState
+    }
+
     getID() {
       return this._id
     }
@@ -75,6 +79,10 @@ class Backend {
 
     getObject() {
       return ORMap.value(this._state)
+    }
+
+    getState() {
+        return this._state
     }
 }
 

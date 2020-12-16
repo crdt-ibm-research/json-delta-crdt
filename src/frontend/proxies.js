@@ -3,6 +3,7 @@ const {ORMap, ORArray, MVReg} = require('../../src/backend/crdts/unifiedCRDTs')
 const CausalContext = require('../backend/causal-context')
 const Peeler = require('./peeler')
 const { MAP, ARRAY, VALUE } = require('../../src/backend/constants')
+const { BACKEND } = require('../../src/frontend/constants')
 
 const JsonArray = require('../../src/backend/JsonObjects/JsonArray')
 const JsonMap = require('../../src/backend/JsonObjects/JsonMap')
@@ -340,6 +341,49 @@ const ListHandler = {
     }
 }
 
+function basicProxyMatcher(m, c, type) {
+    if (type === MAP) {
+        return new Proxy({m, c}, BasicMapHandler)
+    } else if (type === ARRAY) {
+        return new Proxy({m, c}, BasicArrayHandler)
+    } else if (type === VALUE) {
+        return MVReg.value([m, c])
+    } else {
+        throw new Error("Type not specified")
+    }
+}
+
+const FrontendHandler = {
+    get (target, key) {
+        if (typeof key === "symbol") {
+            return target[key]
+        } else {
+            let [m, c] = target[BACKEND].getState()
+            let proxyToBackend = new Proxy({m, c}, BasicMapHandler)
+            // Let the proxy do the logic of lookup
+            return proxyToBackend[key]
+        }
+    },
+}
+
+const BasicMapHandler = {
+    get (target, key) {
+        const { m, c } = target
+        let [val, type] = ORMap.getKey(m, key)
+        return basicProxyMatcher(val, c, type)
+    },
+}
+
+const BasicArrayHandler = {
+    get (target, prop) {
+        //TODO: Check prop is an integer. If not, convert it.
+        //console.log("key: ", key)
+        const { m, c } = target
+        let [val, type] = ORArray.getIdx(m, prop)
+        return basicProxyMatcher(val, c, type)
+    },
+}
+
 /**
  * @param context: a reference to doc (which is [m, cc] of the top level)
  * @param wrappedObject: The object actually wrapped by the proxy (the actual map)
@@ -392,4 +436,4 @@ function instantiateProxy(objectId, readonly) {
     }
 }
 
-module.exports = { createRootObjectProxy }
+module.exports = { createRootObjectProxy, FrontendHandler }
