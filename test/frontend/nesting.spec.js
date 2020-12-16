@@ -126,6 +126,28 @@ describe('check frontend ', () => {
 		})
 	})
 
+	describe('check proxy redirection', () => {
+		let ormap
+		it('check proxy 1', () => {
+			ormap = [new DotMap(ORMap.typename()), new CausalContext("r1")]
+			let context = {}
+			context.doc = ormap
+			let rootProxy = Proxies.createRootObjectProxy(context)
+			let callback = doc => {
+				doc.a = {"b": { "c": 7 }}
+				let tmp = doc.a.b
+				tmp.c = 5
+				// doc.a.b.c = 5
+				// doc.a.b = {"hi": "bye"}
+			}
+			callback(rootProxy)
+			expect(ORMap.value(context.doc)).to.deep.equal(
+
+				{"a": {"b": {"c": new Set([5])} }}
+			)
+		})
+	})
+
 	describe('check array proxy', () => {
 		let ormap
 		it('check init empty array', () => {
