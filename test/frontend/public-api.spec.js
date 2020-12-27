@@ -62,7 +62,7 @@ describe('test frontend public API ', () => {
             // We receive the changes
             doc = DCRDT.applyChanges(doc, delta)
             // the next line fails in tests currently
-            // expect(ORMap.value(DCRDT.documentValue(doc))).to.deep.equal({})
+            //expect(ORMap.value(DCRDT.documentValue(doc))).to.deep.equal({})
         })
     })
 })
