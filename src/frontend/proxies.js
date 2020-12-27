@@ -138,7 +138,8 @@ const MapHandler = {
     //      */
     // },
     //
-    ownKeys (target) {
+
+   /* ownKeys (target) {
         let { context, wrappedObject, mutatorsList, isRoot } = target
         if (isRoot) {
             const [m, cc] = context.doc
@@ -153,17 +154,17 @@ const MapHandler = {
 
         //return wrappedObject.getKeys()
         return wrappedObject.state.entries()
-        /*
+        /!*
         const { context, objectId } = target
         return Object.keys(context.getObject(objectId))
-         */
+         *!/
     },
     getOwnPropertyDescriptor(target, k) {
         return {
             enumerable: true,
             configurable: true,
         };
-    }
+    }*/
 }
 
 const ListHandler = {
