@@ -14,7 +14,7 @@ const {ORMap, ORArray, MVReg} = require('../../src/backend/crdts/unifiedCRDTs')
 const CausalContext = require('../../src/backend/causal-context')
 const { VALUE } = require('../../src/backend/constants')
 
-describe('check frontend ', () => {
+describe('test frontend - utility functionality', () => {
 	describe('check nesting map', () => {
 		let ormap
 
