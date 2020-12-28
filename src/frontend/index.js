@@ -4,12 +4,14 @@ const { BACKEND } = require('../../src/frontend/constants')
 const {DotMap, DotFun, DotFunMap} = require('../../src/backend/dotstores/unifiedDotstores')
 //const { ORMap } = require('../backend/crdts/unifiedCRDTs')
 
+/*
 class Frontend {
   constructor(options) {
     const replicaId = options["REPLICA_ID"] || "r" + Math.floor(Math.random() * 1000)
     this[BACKEND] = new Backend(replicaId)
   }
 }
+*/
 
 function getBackend(frontend) {
   return frontend[BACKEND]
@@ -38,6 +40,13 @@ function change(frontend, options, callback) {
 }
 
 /**
+ * Returns a new document object initialized with the given state.
+ */
+function from(initialState, options) {
+  return change(init(options), 'Initialization', doc => Object.assign(doc, initialState))
+}
+
+/**
  * @param frontend: doc (returned from init, change or applyChanges methods)
  * @param changes: a delta
  * @returns a proxy to a new doc
@@ -50,4 +59,4 @@ function applyChanges(frontend, delta) {
   return frontend
 }
 
-module.exports = { Frontend, init, change, documentValue, applyChanges }
+module.exports = { init, change, documentValue, applyChanges, from }

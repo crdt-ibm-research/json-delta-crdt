@@ -51,7 +51,7 @@ describe('test frontend public API ', () => {
             doc = DCRDT.applyChanges(doc, delta)
             expect(doc.content.hello.name.key).to.deep.equal("abc")
             expect(DCRDT.documentValue(doc)).to.deep.equal(
-                {"content": {"hello": {"name": { "key": new Set(["abc"])} }}}
+                {"content": {"hello": {"name": { "key": new Set(["abc"]) }}}}
             )
 
             // Finally, we remove the element
@@ -62,8 +62,22 @@ describe('test frontend public API ', () => {
 
             // We receive the changes
             doc = DCRDT.applyChanges(doc, delta)
-            // the next line fails in tests currently
             expect(DCRDT.documentValue(doc)).to.deep.equal({})
+        })
+    })
+
+
+    describe('check from utility', () => {
+        it('check from 1', () => {
+            // We start with an empty document
+            let doc = DCRDT.from({"a": { "b": "c" }}, {"REPLICA_ID": "R1"})
+            expect(doc.a.b).to.deep.equal("c")
+        })
+
+        it('check from 2', () => {
+            // We start with an empty document
+            let doc = DCRDT.from({"a": {"b": [1,2,3]}}, {"REPLICA_ID": "R1"})
+            expect(DCRDT.documentValue(doc)).to.deep.equal({"a": {"b": [new Set([1]), new Set([2]), new Set([3])] }})
         })
     })
 })
