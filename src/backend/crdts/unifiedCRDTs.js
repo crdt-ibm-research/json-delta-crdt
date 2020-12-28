@@ -105,7 +105,7 @@ class ORMap {
 	}
 
 	static applyToMap(o, k, [m,cc]) {
-		const inner = function ([m,cc]) {return ORMap.apply(o, MAP, [m, cc])}
+		const inner = function ([state,causalContext]) {return ORMap.apply(o, MAP, [state, causalContext])}
 		const [retMap, retCC] = ORMap.apply(inner, k, [m,cc])
 		// Recommitted a map, delete the other two
 		if (m && m.get(k) && m.get(k).get(ARRAY)) {
@@ -163,7 +163,7 @@ class ORMap {
 		retDotMap.set(ALIVE, fun)
 
 		// Next call o (don't forget to add the dot to the CC)
-		const [newV, retCC] = o([m.get(k), cc.join(funCC)])
+		const [newV, retCC] = o([m.get(k), tmpCC.join(funCC)])
 		retDotMap.set(k ,newV)
 
 		return [retDotMap, retCC.join(funCC)]

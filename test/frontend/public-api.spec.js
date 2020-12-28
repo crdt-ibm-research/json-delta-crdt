@@ -41,16 +41,17 @@ describe('test frontend public API ', () => {
 
             // Some data is inserted to a remote replica
             let remoteReplica = ORMap.create([null, new CausalContext("R2")])
-            let [f, _] = Peeler.genNestedObjectCreation({"hello": {"name": "abc"}})
+            //let remoteReplica =  [new DotMap(ORMap.typename()), new CausalContext("R2")]
+            let [f, _] = Peeler.genNestedObjectCreation({"hello": {"name": {"key": "abc"}}})
             let delta = ORMap.applyToMap(f, "content", remoteReplica)
             remoteReplica = DotMap.join(remoteReplica, delta)
 
             // We receive the changes
             console.log("merging insert delta")
             doc = DCRDT.applyChanges(doc, delta)
-            expect(doc.content.hello.name).to.deep.equal("abc")
+            expect(doc.content.hello.name.key).to.deep.equal("abc")
             expect(DCRDT.documentValue(doc)).to.deep.equal(
-                {"content": {"hello": {"name": new Set(["abc"])} }}
+                {"content": {"hello": {"name": { "key": new Set(["abc"])} }}}
             )
 
             // Finally, we remove the element
@@ -62,7 +63,7 @@ describe('test frontend public API ', () => {
             // We receive the changes
             doc = DCRDT.applyChanges(doc, delta)
             // the next line fails in tests currently
-            //expect(ORMap.value(DCRDT.documentValue(doc))).to.deep.equal({})
+            expect(DCRDT.documentValue(doc)).to.deep.equal({})
         })
     })
 })
