@@ -25,7 +25,7 @@ class Peeler {
             // Create a new map object
             let newCC = CausalContext.from(cc)
             let deltaArray = ORArray.create([null, newCC])
-            let orarray = [new DotMap(ORArray.typename()), cc]
+            let orarray = [new DotMap(ORArray.typename()), newCC]
             orarray = DotMap.join(orarray, deltaArray)
             let i
             for (i  = 0;  i < value.length; i++) {
