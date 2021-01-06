@@ -100,6 +100,7 @@ const MapHandler = {
         }
         const doc = context.doc
         let delta = mutator(doc)
+        context.delta = delta
         context.doc = DotMap.join(doc, delta)
         return true
     },
@@ -241,6 +242,7 @@ const ListHandler = {
         }
         const doc = context.doc
         let delta = mutator(doc)
+        context.delta = delta
         context.doc = DotMap.join(doc, delta)
         return true
     },
