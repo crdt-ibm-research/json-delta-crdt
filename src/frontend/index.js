@@ -1,7 +1,9 @@
-const Backend = require('../../src/backend')
+const Backend = require('../../src/backend/index')
+const CausalContext = require('../../src/backend/causal-context')
 const Proxies = require('../../src/frontend/proxies')
-const { BACKEND, DELTAS, DELTAS_CACHE_MODE, COMPRESSED_DELTAS, UNCOMPRESSED_DELTAS } = require('../../src/frontend/constants')
+const { BACKEND, DELTAS, DELTAS_CACHE_MODE, COMPRESSED_DELTAS, UNCOMPRESSED_DELTAS, REPLICA_ID } = require('../../src/frontend/constants')
 const {DotMap, DotFun, DotFunMap} = require('../../src/backend/dotstores/unifiedDotstores')
+const { ORMap } = require('../../src/backend/crdts/unifiedCRDTs')
 
 function getBackend(frontend) {
   return frontend[BACKEND]
@@ -11,6 +13,10 @@ function documentValue(frontend) {
   return frontend[BACKEND].getObject()
 }
 
+function createBottomDelta(frontend) {
+  return [new DotMap(ORMap.typename()), new CausalContext(frontend[REPLICA_ID])]
+}
+
 /**
  * @param frontend: doc (returned from init, change or applyChanges methods)
  * @param delta: a delta created locally by the change method or delta received from the a remote replica
@@ -18,33 +24,11 @@ function documentValue(frontend) {
  */
 function addDeltaToCache(frontend, delta) {
   if (frontend[DELTAS_CACHE_MODE] == COMPRESSED_DELTAS) {
-    if (frontend[DELTAS].length == 0) {
-      frontend[DELTAS].push(delta)
-    } else {
-      let existingDelta = frontend[DELTAS][0]
-      frontend[DELTAS][0] = DotMap.join(existingDelta, delta)
-    }
+    let existingDelta = frontend[DELTAS][0]
+    frontend[DELTAS][0] = DotMap.join(existingDelta, delta)
   } else if (frontend[DELTAS_CACHE_MODE] == UNCOMPRESSED_DELTAS){
     // we compress only in the end
     frontend[DELTAS].push(delta)
-  }
-}
-
-/**
- * @param frontend: doc (returned from init, change or applyChanges methods)
- * @returns merge of all deltas in cache. Note that this function doesn't change the state or the cache (as the cache will be empties shortly)
- */
-function reduceDeltas(frontend) {
-  if (frontend[DELTAS].length == 0) {
-    return {}
-  } else {
-    let delta = frontend[DELTAS][0]
-    let i
-    for (i  = frontend[DELTAS].length - 1;  i  < frontend[DELTAS].length ; i++) {
-      let currentDelta = frontend[DELTAS][i]
-      delta = DotMap.join(currentDelta, delta)
-    }
-    return delta
   }
 }
 
@@ -53,8 +37,9 @@ function init(options) {
   const replicaId = options["REPLICA_ID"] || "r" + Math.floor(Math.random() * 1000)
   const deltasCacheMode = options["DELTAS_CACHE_MODE"] || COMPRESSED_DELTAS
   Object.defineProperty(frontend, BACKEND, {value: new Backend(replicaId)})
-  Object.defineProperty(frontend, DELTAS, {value: []})
+  Object.defineProperty(frontend, REPLICA_ID, {value: replicaId})
   Object.defineProperty(frontend, DELTAS_CACHE_MODE, {value: deltasCacheMode})
+  Object.defineProperty(frontend, DELTAS, {value: [createBottomDelta(frontend)]})
 
   // return frontend
   return new Proxy(frontend, Proxies.FrontendHandler)
@@ -68,7 +53,6 @@ function change(frontend, options, callback) {
   getBackend(frontend).setState(context.doc)
   addDeltaToCache(frontend, context.delta)
   return frontend
-  // return new Proxy(frontend, Proxies.FrontendHandler)
 }
 
 /**
@@ -84,7 +68,6 @@ function from(initialState, options) {
  * @returns a proxy to a new doc
  */
 function applyChanges(frontend, delta) {
-  //getBackend(frontend).joinDelta(delta)
   let innerState = getBackend(frontend).getState()
   innerState = DotMap.join(innerState, delta)
   getBackend(frontend).setState(innerState)
@@ -97,8 +80,9 @@ function applyChanges(frontend, delta) {
  * @returns merge of all deltas since last call
  */
 function getChanges(frontend) {
-  let reducedDeltas = reduceDeltas(frontend)
-  frontend[DELTAS] = []
+  let deltaReducer = (accumulatedDelta, currentDelta) => DotMap.join(accumulatedDelta, currentDelta);
+  let reducedDeltas = frontend[DELTAS].reduce(deltaReducer)
+  frontend[DELTAS] = [createBottomDelta(frontend)]
   return reducedDeltas
 }
 
