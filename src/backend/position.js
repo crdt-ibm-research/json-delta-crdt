@@ -15,10 +15,15 @@ function randomInt(min, max) {
 }
 // Compares by lexicographic order
 function compareAtoms([lval, lsite], [rval, rsite]) {
-  if (lval === rval) {
-    return lsite.compare(rsite)
-  }
-  return lval - rval
+  try{
+    if (lval === rval) {
+      return lsite.localeCompare(rsite)
+    }
+    return lval - rval
+ }
+ catch (err) {
+   console.log(err)
+ }
 }
 
 class Position {

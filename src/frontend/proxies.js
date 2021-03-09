@@ -262,6 +262,9 @@ function basicProxyMatcher(m, c, type) {
 
 const FrontendHandler = {
     get (target, key) {
+        if (key === "object_bypass") {
+            return target
+        }
         if (typeof key === "symbol") {
             return target[key]
         } else {
