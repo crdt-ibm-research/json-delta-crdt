@@ -23,6 +23,6 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - name: Check dependecies and run on node
-        run: |
-          npx aegir dep-check
-          npx nyc -s aegir test -t node && npx nyc report
+      run: |
+        npx aegir dep-check
+        npx nyc -s aegir test -t node && npx nyc report
