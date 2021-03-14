@@ -36,7 +36,8 @@ function init(options) {
   const frontend = {}
   const replicaId = options["REPLICA_ID"] || "r" + Math.floor(Math.random() * 1000)
   const deltasCacheMode = options["DELTAS_CACHE_MODE"] || COMPRESSED_DELTAS
-  Object.defineProperty(frontend, BACKEND, {value: new Backend(replicaId)})
+  const backend = new Backend(replicaId, options["DOT_STORE"])
+  Object.defineProperty(frontend, BACKEND, {value: backend })
   Object.defineProperty(frontend, REPLICA_ID, {value: replicaId})
   Object.defineProperty(frontend, DELTAS_CACHE_MODE, {value: deltasCacheMode})
   Object.defineProperty(frontend, DELTAS, {value: [createBottomDelta(frontend)]})

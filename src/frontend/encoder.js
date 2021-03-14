@@ -1,13 +1,19 @@
 const msgpack = require('msgpack5')()
+const DCRDT = require('../../src/frontend/index')
+const { BACKEND, REPLICA_ID } = require('../../src/frontend/constants')
 
-msgpack.register(0x40, Map, encodeMap, decodeMap)
-
-function encodeMap (map) {
-    return msgpack.encode(Array.from(map))
+function encodeFrontend (frontend) {
+    // encode only replica_id and the backend
+    return msgpack.encode({
+        REPLICA_ID: frontend[REPLICA_ID],
+        DOT_STORE: frontend[BACKEND].dotstore } )
 }
   
-function decodeMap (buf) {
-    return new Map(msgpack.decode(buf))
+function decodeFrontend (buf) {
+    // decode the buffer
+    const obj = msgpack.decode(buf);
+    // create a front end
+    return DCRDT.init(obj)
 }
 
-module.exports = { encodeMap, decodeMap }
+module.exports = { encodeFrontend, decodeFrontend }
