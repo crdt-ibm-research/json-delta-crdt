@@ -19,8 +19,6 @@ describe('test document encoding ', () => {
 
     it('encode/decode simple document', () => {
         let doc = DCRDT.from({"a": { "b": "c" }}, {"REPLICA_ID": "R1"})
-        // expect(doc.a.b).to.deep.equal("c")
-        expect(doc.a.b).to.deep.equal("c")
         const encodedState = Encoder.encodeFrontend(doc);
         // const documentSize = encodedState.byteLength
         const decoded = Encoder.decodeFrontend(encodedState)
