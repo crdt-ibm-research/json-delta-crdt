@@ -1,8 +1,8 @@
 'use strict'
 
 module.exports = class CustomSet {
-  constructor () {
-    this._refs = new Map()
+  constructor (refs) {
+    this._refs = refs || new Map()
   }
 
   static from(base) {

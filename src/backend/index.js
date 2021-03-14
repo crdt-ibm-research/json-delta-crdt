@@ -16,7 +16,7 @@ class Backend {
     constructor(id, dotstore, type = ORMap.typename()) {
       this._id = id || uuid() // the id of the backend to be used in the causal context
       // the state is (dotstore, cc)
-      this._state = [dotstore || new DotMap(type), new CausalContext(this._id)]
+      this._state = dotstore || [new DotMap(type), new CausalContext(this._id)]
       // the changes
       this._deltas = [undefined,  new CausalContext()]
 

@@ -10,9 +10,9 @@ class CausalContext {
   // The id is used for creating new dots.
   // replicas have a CausalContext with id.
   // delta do not have an id as it is doesn't create dots.
-  constructor(id) {
-    this._cc = new Map() // compact causal context {ID->INT}
-    this._dc = new CustomSet() // dot cloud SET([id,int], ...)
+  constructor(id, cc, dc) {
+    this._cc = cc || new Map() // compact causal context {ID->INT}
+    this._dc = dc || new CustomSet() // dot cloud SET([id,int], ...)
     this._id = id
   }
 
