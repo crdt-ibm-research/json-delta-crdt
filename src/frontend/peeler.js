@@ -49,10 +49,10 @@ class Peeler {
         // Create a new map object
         let newCC = CausalContext.from(cc)
         let ormap = [new DotMap(ORMap.typename()), newCC]
-        let cormap = [new DotMap(ORMap.typename()), new CausalContext(cc.getID())]
+        let dMap = [new DotMap(ORMap.typename()), new CausalContext(cc.getID())]
         let deltaMap = ORMap.create([null, newCC])
         ormap = DotMap.join(ormap, deltaMap) // State for applying changes
-        dMap = DotMap.join(cormap, deltaMap) // Accumulate the joins
+        dMap = DotMap.join(dMap, deltaMap) // Accumulate the joins
         for (let key of Object.keys(value)) {
             const [currFunc, currType] = Peeler.genNestedObjectCreation(value[key])
             let deltaMutator, delta
