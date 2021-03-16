@@ -92,7 +92,8 @@ function encodeFrontend (frontend) {
     // encode only replica_id and the backend
     return msgpack.encode({
         REPLICA_ID: frontend[REPLICA_ID],
-        DOT_STORE: frontend[BACKEND]._state } )
+        DOT_STORE: frontend[BACKEND]._state[0],
+        CC: frontend[BACKEND]._state[1]  } )
 }
   
 function decodeFrontend (buf) {
