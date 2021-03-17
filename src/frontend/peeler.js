@@ -73,7 +73,6 @@ class Peeler {
     } else {
         return [JsonRegister.write(value), "primitive"]
     }
-    return objectId
   }
 
   static genSetValue(value) {
