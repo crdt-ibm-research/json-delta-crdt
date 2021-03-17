@@ -154,6 +154,28 @@ describe('test frontend public API ', () => {
             expect(doc2.arr[1]).to.deep.equal(1)
             expect(doc2.arr[2]).to.deep.equal(2)
         })
+
+        it('check overriding value', () => {
+            let doc = DCRDT.init({"REPLICA_ID": "R1" })
+            doc = DCRDT.change(doc, "test", doc => {
+                doc.a = {"b": { "c": 7 }}
+                doc.a.b.c = 5
+    
+            })
+    
+            doc = DCRDT.change(doc, "test", doc => {
+                doc.a.b = {"hi": "bye"}
+            })
+    
+            expect(DCRDT.documentValue(doc)).to.deep.equal(
+            {
+                "a": {
+                    "b": { 
+                        "hi": new Set(["bye"])
+                    }
+                }
+            })
+        })
     })
 
     describe('check from utility', () => {
