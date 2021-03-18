@@ -49,7 +49,7 @@ class Peeler {
         // Create a new map object
         let newCC = CausalContext.from(cc)
         let ormap = [new DotMap(ORMap.typename()), newCC]
-        let dMap = [new DotMap(ORMap.typename()), new CausalContext(cc.getID())]
+        let dMap = [new DotMap(ORMap.typename()), newCC]
         let deltaMap = ORMap.create([null, newCC])
         ormap = DotMap.join(ormap, deltaMap) // State for applying changes
         dMap = DotMap.join(dMap, deltaMap) // Accumulate the joins
@@ -73,7 +73,6 @@ class Peeler {
     } else {
         return [JsonRegister.write(value), "primitive"]
     }
-    return objectId
   }
 
   static genSetValue(value) {
