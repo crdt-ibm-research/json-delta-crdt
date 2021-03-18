@@ -173,6 +173,10 @@ class ORMap {
 		assert(m instanceof DotMap)
 		assert(cc instanceof CausalContext)
 
+		if (!m.get(k)) {
+			return [new DotMap(ORMap.typename()), new CausalContext()]
+		}
+
 		const retCC = new CausalContext().insertDots(m.get(k).dots())
 		return [new DotMap(ORMap.typename()), retCC]
 	}

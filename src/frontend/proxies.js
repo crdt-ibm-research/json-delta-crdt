@@ -65,10 +65,23 @@ const MapHandler = {
             throw new Error("Type not specified")
         }
     },
-
      set (target, key, value) {
         const { context, wrappedObject, mutatorsList, isRoot } = target
         let [mutator, type] = Peeler.genNestedObjectCreation(value)
+
+        // if key exists:
+        //   add JsonMap.remove(key)
+
+        let clearMutator = JsonMap.remove(key)
+        let i
+        for (i  = mutatorsList.length - 1;  i >= 0; i--) {
+            //console.log("in for-loop")
+            clearMutator = mutatorsList[i](clearMutator)
+        }
+        const doc = context.doc
+        let clearDelta = clearMutator(doc)
+
+
         if (type === "map") {
             mutatorsList.push(function (f) {
                 return JsonMap.applyToMap(f, key)
@@ -93,29 +106,43 @@ const MapHandler = {
             }) */
 
         }
-        let i
         for (i  = mutatorsList.length - 1;  i >= 0; i--) {
             //console.log("in for-loop")
             mutator = mutatorsList[i](mutator)
         }
-        const doc = context.doc
+        // const doc = context.doc
         let delta = mutator(doc)
+        delta = DotMap.join(delta, clearDelta)
         context.delta = delta
         context.doc = DotMap.join(doc, delta)
         return true
     },
-    //
-    // deleteProperty (target, key) {
-    //     throw new Error("deleteProperty is not implemented yet")
-    //     /*
-    //     const { context, objectId, readonly } = target
-    //     if (Array.isArray(readonly) && readonly.indexOf(key) >= 0) {
-    //         throw new RangeError(`Object property "${key}" cannot be modified`)
-    //     }
-    //     context.deleteMapKey(objectId, key)
-    //     return true
-    //      */
-    // },
+
+    deleteProperty (target, key) {
+        const { context, wrappedObject, mutatorsList, isRoot } = target
+
+        let clearMutator = JsonMap.remove(key)
+        let i
+        for (i  = mutatorsList.length - 1;  i >= 0; i--) {
+            //console.log("in for-loop")
+            clearMutator = mutatorsList[i](clearMutator)
+        }
+        const doc = context.doc
+        let clearDelta = clearMutator(doc)
+
+        context.delta = clearDelta
+        context.doc = DotMap.join(doc, clearDelta)
+        return true
+        //throw new Error("deleteProperty is not implemented yet")
+        /*
+        const { context, objectId, readonly } = target
+        if (Array.isArray(readonly) && readonly.indexOf(key) >= 0) {
+            throw new RangeError(`Object property "${key}" cannot be modified`)
+        }
+        context.deleteMapKey(objectId, key)
+        return true
+         */
+    },
     //
     // has (target, key) {
     //     throw new Error("has is not implemented yet")
