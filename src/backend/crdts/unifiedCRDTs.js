@@ -170,12 +170,12 @@ class ORMap {
 	}
 
 	static remove(k, [m,cc]) {
-		assert(m instanceof DotMap)
-		assert(cc instanceof CausalContext)
-
-		if (!m.get(k)) {
+		if (!m || !m.get(k)) {
 			return [new DotMap(ORMap.typename()), new CausalContext()]
 		}
+
+		assert(cc instanceof CausalContext)
+		assert(m instanceof DotMap)
 
 		const retCC = new CausalContext().insertDots(m.get(k).dots())
 		return [new DotMap(ORMap.typename()), retCC]
