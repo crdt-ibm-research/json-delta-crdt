@@ -4,9 +4,9 @@ on:
   push:
     branches:
       - master
-    pull_request:
-      branches:
-        - master
+  pull_request:
+    branches:
+      - master
   workflow_dispatch:
 
 jobs:
@@ -25,7 +25,10 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - name: Check dependecies and run on node
+    - name: Install dependecies
+      run: npm install
+    - name: Verify dependecies
+      run: npx aegir dep-check 
+    - name: Run Tests
       run: |
-        npx aegir dep-check 
-        npx nyc -s aegir test -t node && npx nyc report
+        npm run test
