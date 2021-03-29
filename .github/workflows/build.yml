@@ -27,6 +27,8 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - name: Install dependecies
       run: npm install
-    - name: Check dependecies and run on node
+    - name: Verify dependecies
+      run: npx aegir dep-check 
+    - name: Run Tests
       run: |
         npm run test
