@@ -23,7 +23,7 @@
     "p-queue": "^3.0.0",
     "pre-commit": "^1.2.2",
     "shuffle-array": "^1.0.1",
-    "yjs": "^13.5.3"
+    "yjs": "^13.5.4"
   },
   "dependencies": {
     "delta-crdts-msgpack-codec": "~0.2.0",
