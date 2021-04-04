@@ -25,8 +25,10 @@ class Peeler {
             // Create a new map object
             let newCC = CausalContext.from(cc)
             let deltaArray = ORArray.create([null, newCC])
+            let darray = [new DotMap(ORArray.typename()), newCC]
             let orarray = [new DotMap(ORArray.typename()), newCC]
             orarray = DotMap.join(orarray, deltaArray)
+            darray = DotMap.join(darray, deltaArray)
             let i
             for (i  = 0;  i < value.length; i++) {
                 const [currFunc, currType] = Peeler.genNestedObjectCreation(value[i])
@@ -40,8 +42,9 @@ class Peeler {
                 }
                 delta = deltaMutator(orarray)
                 orarray = DotMap.join(orarray, delta)
+                darray = DotMap.join(darray, delta)
             }
-            return orarray
+            return darray
         }
         return [f, "array"]
     } else if (isObject(value)){
