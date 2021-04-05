@@ -273,6 +273,23 @@ const ListHandler = {
         context.doc = DotMap.join(doc, delta)
         return true
     },
+
+    deleteProperty (target, idx) {
+        const { context, wrappedObject, mutatorsList, isRoot } = target
+
+        let clearMutator = JsonArray.delete(idx)
+        let i
+        for (i  = mutatorsList.length - 1;  i >= 0; i--) {
+            //console.log("in for-loop")
+            clearMutator = mutatorsList[i](clearMutator)
+        }
+        const doc = context.doc
+        let clearDelta = clearMutator(doc)
+
+        context.delta = clearDelta
+        context.doc = DotMap.join(doc, clearDelta)
+        return true
+      },
 }
 
 function basicProxyMatcher(m, c, type) {
