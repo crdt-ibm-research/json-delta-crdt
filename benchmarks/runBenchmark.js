@@ -1,3 +1,6 @@
+const util = require('util')
+
+
 const Automerge = require('automerge')
 const Y = require('yjs')
 
@@ -36,22 +39,34 @@ let docYjs = new Y.Doc()
 
 let docDeltaInspection, docAutomergeInspection, docYjsInspection
 
-function runTest(test, yjsTest) {
-    for (n=1; n<=524288; n = n*2) {
+function runTest(test, yjsTest, maxN = 524288, log = false) {
+    for (n=1; n<=maxN; n = n*2) {
         // console.log(`Starting ${n}:`)
     
         docDelta = DCRDT.init({"REPLICA_ID": "R1"})
         docDelta = test(DCRDT, docDelta, n)
+        if (log) {
+            console.log("DCRDT")
+            console.log(DCRDT.documentValue(docDelta))
+        }
         docDeltaInspection = Encoder.encodeFrontend(docDelta).byteLength
         // console.log(`Size of docDelta: ${docinspection.length} bytes.`)
     
         docAutomerge = Automerge.init()
         docAutomerge = test(Automerge, docAutomerge, n)
+        if (log) {
+            console.log("Automerge")
+            console.log(util.inspect(docAutomerge, {showHidden: false, depth: null}))
+        }
         docAutomergeInspection = Automerge.save(docAutomerge).length
         // docAutomergeInspection = util.inspect(docAutomerge, INSPECT_OPTIONS)
         
         docYjs = new Y.Doc()
         docYjs = yjsTest(docYjs, n)
+        if (log) {
+            console.log("yjs")
+            console.log(util.inspect(docYjs.toJSON(), {showHidden: false, depth: null}))
+        }
         docYjsInspection = Y.encodeStateAsUpdateV2(docYjs).byteLength
         // console.log(`Size of docYjs: ${docinspection.length} bytes.`)
     

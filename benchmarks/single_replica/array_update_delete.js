@@ -8,6 +8,9 @@ function test(lib, doc1, n) {
         doc1 = lib.change(doc1, "test", doc => {
             doc.a[0] = i
         })
+        doc1 = lib.change(doc1, "test", doc => {
+            delete doc.a[0]
+        })
     }
 
     return doc1 

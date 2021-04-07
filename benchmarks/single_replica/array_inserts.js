@@ -13,14 +13,10 @@ function test(lib, doc1, n) {
 }
 
 function jysTest(doc1, n) {
-    tmp = {}
-    base = tmp
+    const yarray = doc1.getArray('a')
     for (i=0; i<n; i++) {
-        tmp.a = {}
-        tmp = tmp.a
+        yarray.insert(i, [i])
     }
-    tmp.a = 0
-    doc1.getMap('a')['0'] = base
     return doc1
 }
 
