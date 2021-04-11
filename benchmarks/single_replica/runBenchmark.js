@@ -1,12 +1,16 @@
 const util = require('util')
 
+// for verifying encode/decode
+const chai = require('chai')
+const dirtyChai = require('dirty-chai')
+const expect = chai.expect
+chai.use(dirtyChai)
 
 const Automerge = require('automerge')
 const Y = require('yjs')
 
 const DCRDT = require('../../src/frontend/index')
 const Encoder = require('../../src/frontend/encoder')
-
 
 function mapTest(lib, doc1, n) {
     doc1 = lib.change(doc1, "test" + n, doc => {
@@ -49,7 +53,23 @@ function runTest(test, yjsTest, maxN = 524288, log = false) {
             console.log("DCRDT")
             console.log(DCRDT.documentValue(docDelta))
         }
-        docDeltaInspection = Encoder.encodeFrontend(docDelta).byteLength
+        const encoded = Encoder.encodeFrontend(docDelta)
+        docDeltaInspection = encoded.byteLength
+
+        // decode and verify same content
+        let decoded = Encoder.decodeFrontend(encoded)
+        expect(DCRDT.documentValue(decoded)).to.deep.equal(DCRDT.documentValue(docDelta))
+
+        // do another operation on both and check the document is still valid
+        docDelta = DCRDT.change(docDelta, "test", doc => {
+            doc.test = "true"
+        })
+
+        decoded = DCRDT.change(decoded, "test", doc => {
+            doc.test = "true"
+        })
+        expect(DCRDT.documentValue(decoded)).to.deep.equal(DCRDT.documentValue(docDelta))
+
         // console.log(`Size of docDelta: ${docinspection.length} bytes.`)
     
         docAutomerge = Automerge.init()
