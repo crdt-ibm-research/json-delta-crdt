@@ -4,8 +4,8 @@ const util = require('util')
 const Automerge = require('automerge')
 const Y = require('yjs')
 
-const DCRDT = require('../src/frontend/index')
-const Encoder = require('../src/frontend/encoder')
+const DCRDT = require('../../src/frontend/index')
+const Encoder = require('../../src/frontend/encoder')
 
 
 function mapTest(lib, doc1, n) {
