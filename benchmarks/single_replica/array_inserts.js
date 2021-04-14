@@ -1,4 +1,4 @@
-const { runTest } = require('runBenchmark')
+const { runTest } = require('./runBenchmark')
 
 function test(lib, doc1, n) {
     doc1 = lib.change(doc1, "test" + n, doc => {
