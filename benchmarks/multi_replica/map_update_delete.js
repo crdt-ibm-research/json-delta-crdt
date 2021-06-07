@@ -41,39 +41,42 @@ let deltaFlag = true, autoFlag = true, yjsFlag = true
 
 
 function deltaTest(doc, i) {
+    key = `${i - (i % 2)}`
     if (i % 2 == 0) {
         doc = DCRDT.change(doc, "test" + i, doc => {
-            doc.a.b = 0
+            doc.a[key] = 0
         })
         return doc
     } else {
         doc = DCRDT.change(doc, "test" + i, doc => {
-            delete doc.a.b
+            delete doc.a[key]
         })
         return doc
     }
 }
 
 function autoTest(doc, i) {
+    key = `${i - (i % 2)}`
     if (i % 2 == 0) {
         doc = Automerge.change(doc, "test" + i, doc => {
-            doc.a.b = 0
+            doc.a[key] = 0
         })
         return doc
     } else {
         doc = Automerge.change(doc, "test" + i, doc => {
-            delete doc.a.b
+            delete doc.a[key]
         })
         return doc
     }
 }
 
 function yjsTest(doc, i) {
+    key = `${i - (i % 2)}`
     if (i % 2 == 0) {
-        doc.getMap('a').set('b', 0)
+        doc.getMap('a').set(key, 0)
         return doc
     } else {
-        doc.getMap('a').delete('b')
+        doc.getMap('a').delete(key)
         return doc
     }
 

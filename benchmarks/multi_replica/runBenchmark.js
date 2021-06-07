@@ -28,7 +28,7 @@ function initTest(nReplicas, [deltaInit, autoInit, yjsInit]) {
     }
 
     for (let i = 0; i < nReplicas; i++) {
-        const yjsState = Y.encodeStateAsUpdate(yjsDocs[i])
+        const yjsState = Y.encodeStateAsUpdateV2(yjsDocs[i])
         const delta = DCRDT.getChanges(deltaDocs[i])
         for (let j = 0; j < nReplicas; j++) {
             if (i == j) continue
@@ -41,10 +41,16 @@ function initTest(nReplicas, [deltaInit, autoInit, yjsInit]) {
     return [deltaDocs, autoDocs, yjsDocs]
 }
 
+function wait(ms){
+    var start = new Date().getTime();
+    var end = start;
+    while(end < start + ms) {
+      end = new Date().getTime();
+   }
+ }
+
 function runIter(nReplicas, [deltaTest, autoTest, yjsTest], iter, [deltaDocs, autoDocs, yjsDocs], log = false) {
     //[deltaDocs, autoDocs, yjsDocs] = initTest(nReplicas, deltaInit, autoInit, yjsInit)
-
-
 
     for (let i = 0; i < iter; i++) {
         // Get random replica
@@ -55,8 +61,13 @@ function runIter(nReplicas, [deltaTest, autoTest, yjsTest], iter, [deltaDocs, au
         autoDocs[replica] = autoTest(autoDocs[replica], i)
         yjsDocs[replica] = yjsTest(yjsDocs[replica], i)
 
+        /*
+        if (i == iter - 2) {
+            wait(60 * 1000);
+        }*/
+
         // Merge all
-        const yjsState = Y.encodeStateAsUpdate(yjsDocs[replica])
+        const yjsState = Y.encodeStateAsUpdateV2(yjsDocs[replica])
         let delta = DCRDT.getChanges(deltaDocs[replica])
         for (let i = 0; i < nReplicas; i++) {
             if (i == replica) continue
@@ -66,19 +77,19 @@ function runIter(nReplicas, [deltaTest, autoTest, yjsTest], iter, [deltaDocs, au
         }
     }
 
-    return [deltaDocs, autoDocs, yjsDocs]
-
     for (let i = 0; i < nReplicas; i++) {
         let docDeltaInspection = Encoder.encodeFrontend(deltaDocs[i]).byteLength
         let docAutomergeInspection = Automerge.save(autoDocs[i]).length
         let docYjsInspection = Y.encodeStateAsUpdateV2(yjsDocs[i]).byteLength
         console.log(`Replica ${i}:, ${docDeltaInspection},${docAutomergeInspection},${docYjsInspection}`)
     }
+
+    return [deltaDocs, autoDocs, yjsDocs]
 }
 
 function _runTest(nReplicas, testFuns, initFuns, n, log = false) {
 
-    for (let i = 1; i <= n; i *= 2) {
+    for (let i = 2048; i <= n; i *= 2) {
         let docs = initTest(nReplicas, initFuns)
 
         runIter(nReplicas, testFuns, i, docs)

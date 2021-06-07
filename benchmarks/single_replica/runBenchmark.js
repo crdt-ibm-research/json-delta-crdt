@@ -43,8 +43,8 @@ let docYjs = new Y.Doc()
 
 let docDeltaInspection, docAutomergeInspection, docYjsInspection
 
-function runTest(test, yjsTest, maxN = 524288, log = false) {
-    for (n=1; n<=maxN; n = n*2) {
+function runTest(test, yjsTest, sizes = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144, 524288], log = false) {
+    sizes.forEach(n => {
         // console.log(`Starting ${n}:`)
     
         docDelta = DCRDT.init({"REPLICA_ID": "R1"})
@@ -56,19 +56,19 @@ function runTest(test, yjsTest, maxN = 524288, log = false) {
         const encoded = Encoder.encodeFrontend(docDelta)
         docDeltaInspection = encoded.byteLength
 
-        // decode and verify same content
-        let decoded = Encoder.decodeFrontend(encoded)
-        expect(DCRDT.documentValue(decoded)).to.deep.equal(DCRDT.documentValue(docDelta))
+        // // decode and verify same content
+        // let decoded = Encoder.decodeFrontend(encoded)
+        // expect(DCRDT.documentValue(decoded)).to.deep.equal(DCRDT.documentValue(docDelta))
 
-        // do another operation on both and check the document is still valid
-        docDelta = DCRDT.change(docDelta, "test", doc => {
-            doc.test = "true"
-        })
+        // // do another operation on both and check the document is still valid
+        // docDelta = DCRDT.change(docDelta, "test", doc => {
+        //     doc.test = "true"
+        // })
 
-        decoded = DCRDT.change(decoded, "test", doc => {
-            doc.test = "true"
-        })
-        expect(DCRDT.documentValue(decoded)).to.deep.equal(DCRDT.documentValue(docDelta))
+        // decoded = DCRDT.change(decoded, "test", doc => {
+        //     doc.test = "true"
+        // })
+        // expect(DCRDT.documentValue(decoded)).to.deep.equal(DCRDT.documentValue(docDelta))
 
         // console.log(`Size of docDelta: ${docinspection.length} bytes.`)
     
@@ -91,7 +91,7 @@ function runTest(test, yjsTest, maxN = 524288, log = false) {
         // console.log(`Size of docYjs: ${docinspection.length} bytes.`)
     
         console.log(`${n},${docDeltaInspection},${docAutomergeInspection},${docYjsInspection}`)
-    }
+    });
 }
 
 module.exports = { runTest }
