@@ -1,36 +1,37 @@
 {
-  "name": "json-delta-crdt",
-  "version": "0.1.0",
-  "description": "delta based CRDTs supporting JSON data",
-  "main": "index.js",
-  "scripts": {
-    "test": "npm run test:node",
-    "test:node": "nyc -s aegir test -t node && npx nyc report",
-    "test:browser": "AEGIR_BROWSERS=Chrome,Firefox aegir test --target browser",
-    "lint": "aegir lint"
-  },
-  "author": "",
-  "license": "IBM",
-  "devDependencies": {
-    "aegir": "^18.0.3",
-    "allcombinations": "^1.1.4",
-    "automerge": "^0.14.2",
-    "chai": "^4.2.0",
-    "delay": "^4.1.0",
-    "dirty-chai": "^2.0.1",
-    "mocha": "^8.1.3",
-    "object-sizeof": "^1.6.1",
-    "p-queue": "^3.0.0",
-    "pre-commit": "^1.2.2",
-    "shuffle-array": "^1.0.1",
-    "yjs": "^13.5.4"
-  },
-  "dependencies": {
-    "delta-crdts-msgpack-codec": "~0.2.0",
-    "msgpack5": "^3.6.1",
-    "uuid": "^3.4.0"
-  },
-  "pre-commit": [
-    "test"
-  ]
+    "name": "json-delta-crdt",
+    "version": "0.1.0",
+    "description": "delta based CRDTs supporting JSON data",
+    "main": "index.js",
+    "scripts": {
+        "test": "npm run test:node",
+        "test:node": "nyc -s aegir test -t node && npx nyc report",
+        "test:browser": "AEGIR_BROWSERS=Chrome,Firefox aegir test --target browser",
+        "lint": "aegir lint",
+        "bench": "node benchmarks/multi_replica/array_update_delete.js"
+    },
+    "author": "",
+    "license": "IBM",
+    "devDependencies": {
+        "aegir": "^18.0.3",
+        "allcombinations": "^1.1.4",
+        "automerge": "^0.14.2",
+        "chai": "^4.2.0",
+        "delay": "^4.1.0",
+        "dirty-chai": "^2.0.1",
+        "mocha": "^8.1.3",
+        "object-sizeof": "^1.6.1",
+        "p-queue": "^3.0.0",
+        "pre-commit": "^1.2.2",
+        "shuffle-array": "^1.0.1",
+        "yjs": "^13.5.11"
+    },
+    "dependencies": {
+        "delta-crdts-msgpack-codec": "~0.2.0",
+        "msgpack5": "^3.6.1",
+        "uuid": "^3.4.0"
+    },
+    "pre-commit": [
+        "test"
+    ]
 }

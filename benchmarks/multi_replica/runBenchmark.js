@@ -13,7 +13,9 @@ const DCRDT = require('../../src/frontend/index')
 const Encoder = require('../../src/frontend/encoder')
 
 function initTest(nReplicas, [deltaInit, autoInit, yjsInit]) {
-    let deltaDocs = [], autoDocs = [], yjsDocs = []
+    let deltaDocs = [],
+        autoDocs = [],
+        yjsDocs = []
 
     for (let i = 0; i < nReplicas; i++) {
         const docDelta = deltaInit(i)
@@ -41,13 +43,13 @@ function initTest(nReplicas, [deltaInit, autoInit, yjsInit]) {
     return [deltaDocs, autoDocs, yjsDocs]
 }
 
-function wait(ms){
+function wait(ms) {
     var start = new Date().getTime();
     var end = start;
-    while(end < start + ms) {
-      end = new Date().getTime();
-   }
- }
+    while (end < start + ms) {
+        end = new Date().getTime();
+    }
+}
 
 function runIter(nReplicas, [deltaTest, autoTest, yjsTest], iter, [deltaDocs, autoDocs, yjsDocs], log = false) {
     //[deltaDocs, autoDocs, yjsDocs] = initTest(nReplicas, deltaInit, autoInit, yjsInit)
@@ -73,7 +75,7 @@ function runIter(nReplicas, [deltaTest, autoTest, yjsTest], iter, [deltaDocs, au
             if (i == replica) continue
             deltaDocs[i] = DCRDT.applyChanges(deltaDocs[i], delta)
             autoDocs[i] = Automerge.merge(autoDocs[i], autoDocs[replica])
-            Y.applyUpdate(yjsDocs[i], yjsState)
+            Y.applyUpdateV2(yjsDocs[i], yjsState)
         }
     }
 
@@ -93,16 +95,16 @@ function _runTest(nReplicas, testFuns, initFuns, n, log = false) {
         let docs = initTest(nReplicas, initFuns)
 
         runIter(nReplicas, testFuns, i, docs)
-    
+
         let [deltaDocs, autoDocs, yjsDocs] = docs
 
         if (log) {
             console.log("DCRDT")
             console.log(DCRDT.documentValue(deltaDocs[0]))
             console.log("Automerge")
-            console.log(util.inspect(autoDocs[0], {showHidden: false, depth: null}))
+            console.log(util.inspect(autoDocs[0], { showHidden: false, depth: null }))
             console.log("yjs")
-            console.log(util.inspect(yjsDocs[0].toJSON(), {showHidden: false, depth: null}))
+            console.log(util.inspect(yjsDocs[0].toJSON(), { showHidden: false, depth: null }))
         }
 
         let docDeltaInspection = Encoder.encodeFrontend(deltaDocs[0]).byteLength
@@ -118,7 +120,7 @@ function _runTest(nReplicas, testFuns, initFuns, n, log = false) {
             console.log(`Replica ${r}:, ${docDeltaInspection},${docAutomergeInspection},${docYjsInspection}`)
         }
         */
-        
+
     }
 }
 
@@ -136,7 +138,7 @@ function runTest(nReplicasArr, testFuns, initFuns, maxN, log = false) {
     for (let i = 0; i < nReplicasArr.length; i++) {
         let nReplicas = nReplicasArr[i]
         console.log(`nReplicas = ${nReplicas}`)
-        _runTest(nReplicas, testFuns, initFuns, maxN, log)       
+        _runTest(nReplicas, testFuns, initFuns, maxN, log)
     }
 }
 

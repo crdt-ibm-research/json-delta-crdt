@@ -16,9 +16,9 @@ const { runTest } = require('./runBenchmark')
 
 
 function deltaInit(i) {
-    let docDelta = DCRDT.init({"REPLICA_ID": `R${i}`})
+    let docDelta = DCRDT.init({ "REPLICA_ID": `R${i}` })
     docDelta = DCRDT.change(docDelta, "init", doc => {
-        doc.a = [ ]
+        doc.a = []
     })
     return docDelta
 }
@@ -26,7 +26,7 @@ function deltaInit(i) {
 function autoInit() {
     let docAutomerge = Automerge.init()
     docAutomerge = Automerge.change(docAutomerge, "init", doc => {
-        doc.a = [ ]
+        doc.a = []
     })
     return docAutomerge
 }
@@ -34,14 +34,14 @@ function autoInit() {
 function yjsInit() {
     const docYjs = new Y.Doc()
     const yarray = docYjs.getArray('a')
-    //yarray.insert(0, [-1])
+        //yarray.insert(0, [-1])
     return docYjs
 }
 
 function deltaTest(doc, i) {
     if (i % 2 == 0) {
         doc = DCRDT.change(doc, "test" + i, doc => {
-            doc.a[0] = i
+            doc.a[0] = { "a": i }
         })
         return doc
     } else {
@@ -55,7 +55,7 @@ function deltaTest(doc, i) {
 function autoTest(doc, i) {
     if (i % 2 == 0) {
         doc = Automerge.change(doc, "test" + i, doc => {
-            doc.a[0] = i
+            doc.a[0] = { "a": i }
         })
         return doc
     } else {
@@ -69,13 +69,15 @@ function autoTest(doc, i) {
 function yjsTest(doc, i) {
     const yarray = doc.getArray('a')
     if (i % 2 == 0) {
-        yarray.insert(0, [i])
+        // let m = new Y.Map()
+        // m.set("a", i)
+        // yarray.insert(0, [m])
+        yarray.push([i])
         return doc
     } else {
-        yarray.delete(0,1)
+        yarray.delete(0, 1)
         return doc
     }
-
 }
 
-runTest([2,3,6, 20], [deltaTest, autoTest, yjsTest], [deltaInit, autoInit, yjsInit], 8192*2)
+runTest([2, 3, 6, 20], [deltaTest, autoTest, yjsTest], [deltaInit, autoInit, yjsInit], 8192 * 2)
