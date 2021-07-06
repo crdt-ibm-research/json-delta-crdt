@@ -12,7 +12,6 @@ class JsonArray {
         return ORArray.value(state)
     }
 
-    
 	static create() {
         return function([m,cc]) { return ORArray.create([m,cc]) }
     }

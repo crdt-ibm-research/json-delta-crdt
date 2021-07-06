@@ -12,29 +12,29 @@ const expect = chai.expect
 chai.use(dirtyChai)
 
 describe('test frontend public API ', () => {
-        describe('check init and change', () => {
-            it('check empty nesting', () => {
-                let doc = DCRDT.init({"REPLICA_ID": "R1"})
-                doc = DCRDT.change(doc, "test", doc => {
-                    doc.a = {"b": { "c": 7 }}
-                    doc.a.b.c = 5
-                    doc.a.b = {"hi": "bye"}
-                })
-                expect(DCRDT.documentValue(doc)).to.deep.equal(
-                    {"a": {"b": {"hi": new Set(["bye"])} }}
-                )
-                expect(doc.a.b.hi).to.deep.equal("bye")
-
-                doc = DCRDT.change(doc, "test", doc => {
-                    doc.a.b = {"hi": "bye-2"}
-                })
-                expect(doc.a.b.hi).to.deep.equal("bye-2")
-                doc = DCRDT.change(doc, "test", doc => {
-                    doc.a.c = {"hi": "bye-3"}
-                })
-                expect(doc.a.c.hi).to.deep.equal("bye-3")
+    describe('check init and change', () => {
+        it('check empty nesting', () => {
+            let doc = DCRDT.init({"REPLICA_ID": "R1"})
+            doc = DCRDT.change(doc, "test", doc => {
+                doc.a = {"b": { "c": 7 }}
+                doc.a.b.c = 5
+                doc.a.b = {"hi": "bye"}
             })
+            expect(DCRDT.documentValue(doc)).to.deep.equal(
+                {"a": {"b": {"hi": new Set(["bye"])} }}
+            )
+            expect(doc.a.b.hi).to.deep.equal("bye")
+
+            doc = DCRDT.change(doc, "test", doc => {
+                doc.a.b = {"hi": "bye-2"}
+            })
+            expect(doc.a.b.hi).to.deep.equal("bye-2")
+            doc = DCRDT.change(doc, "test", doc => {
+                doc.a.c = {"hi": "bye-3"}
+            })
+            expect(doc.a.c.hi).to.deep.equal("bye-3")
         })
+    })
 
     describe('check apply changes', () => {
         it('check apply changes', () => {
@@ -103,7 +103,7 @@ describe('test frontend public API ', () => {
 
             delta = DCRDT.getChanges(doc)
             doc2 = DCRDT.applyChanges(doc2, delta)
-            // TODO: compare entire array at once
+
             expect(doc2.arr[0]).to.deep.equal(0)
             expect(doc2.arr[1]).to.deep.equal(1)
             expect(doc2.arr[2]).to.deep.equal(2)
@@ -146,7 +146,7 @@ describe('test frontend public API ', () => {
 
             delta = DCRDT.getChanges(doc)
             doc2 = DCRDT.applyChanges(doc2, delta)
-            // TODO: Check how to compare entire array at once
+
             expect(doc2.arr[0]).to.deep.equal(0)
             expect(doc2.arr[1]).to.deep.equal(1)
             expect(doc2.arr[2]).to.deep.equal(2)

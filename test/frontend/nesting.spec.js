@@ -236,7 +236,5 @@ describe('test frontend - utility functionality', () => {
 				{ "array" : [ { "a" : new Set([1]) }  ] }
 			)
 		})
-
 	})
-
 })

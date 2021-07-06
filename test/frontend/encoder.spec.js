@@ -20,8 +20,14 @@ describe('test document encoding ', () => {
     it('encode/decode simple document', () => {
         let doc = DCRDT.from({"a": { "b": "c" }}, {"REPLICA_ID": "R1"})
         const encodedState = Encoder.encodeFrontend(doc);
-        // const documentSize = encodedState.byteLength
         const decoded = Encoder.decodeFrontend(encodedState)
         expect(decoded.a.b).to.deep.equal("c")
+    })
+
+    it('encode/decode simple document 2', () => {
+        let doc = DCRDT.from({"a": { "b": ["c"] }}, {"REPLICA_ID": "R1"})
+        const encodedState = Encoder.encodeFrontend(doc);
+        const decoded = Encoder.decodeFrontend(encodedState)
+        expect(decoded.a.b[0]).to.deep.equal("c")
     })
 })
