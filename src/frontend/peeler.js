@@ -3,7 +3,6 @@ const {ORMap, ORArray} = require('../backend/crdts')
 const JsonArray = require('../../src/backend/JsonObjects/JsonArray')
 const JsonMap = require('../../src/backend/JsonObjects/JsonMap')
 const JsonRegister = require('../../src/backend/JsonObjects/JsonRegister')
-
 const CausalContext = require('../../src/backend/causal-context')
 
 class Peeler {
@@ -15,7 +14,7 @@ class Peeler {
   static genNestedObjectCreation(value) {
     if (Array.isArray(value)) {
         let f = function ([m,cc]) {
-            // Create a new map object
+            // Create a new array object
             let newCC = CausalContext.from(cc)
             let deltaArray = ORArray.create([null, newCC])
             let darray = [new DotMap(ORArray.typename()), newCC]
