@@ -9,10 +9,10 @@ chai.use(dirtyChai)
 const Peeler = require('../../src/frontend/peeler')
 const Proxies = require('../../src/frontend/proxies')
 
-const {DotMap, DotFun, DotFunMap} = require('../../src/backend/dotstores/unifiedDotstores')
-const {ORMap, ORArray, MVReg} = require('../../src/backend/crdts/unifiedCRDTs')
+const { DotMap } = require('../../src/backend/dotstores/unifiedDotstores')
+const { ORMap } = require('../../src/backend/crdts/unifiedCRDTs')
 const CausalContext = require('../../src/backend/causal-context')
-const { VALUE } = require('../../src/backend/constants')
+
 
 describe('test frontend - utility functionality', () => {
 	describe('check nesting map', () => {
@@ -48,7 +48,6 @@ describe('test frontend - utility functionality', () => {
 			let [f, _] = Peeler.genNestedObjectCreation([ ])
 			let delta = ORMap.applyToArray(f, "content", ormap)
 			ormap = DotMap.join(ormap, delta)
-			//console.log(ORMap.value(ormap))
 			expect(ORMap.value(ormap)).to.deep.equal(
 
 				{"content": [ ] }
@@ -63,7 +62,6 @@ describe('test frontend - utility functionality', () => {
 			let [f, _] = Peeler.genNestedObjectCreation([1, 2, 3])
 			let delta = ORMap.applyToArray(f, "content", ormap)
 			ormap = DotMap.join(ormap, delta)
-			//console.log(ORMap.value(ormap))
 			expect(ORMap.value(ormap)).to.deep.equal(
 
 				{"content": [new Set([1]), new Set([2]), new Set([3])] }
@@ -79,11 +77,8 @@ describe('test frontend - utility functionality', () => {
 			ormap = [new DotMap(ORMap.typename()), cc]
             let deltaMap = ORMap.create([null, cc])
             ormap = DotMap.join(ormap, deltaMap)
-
 			let context = {}
 			context.doc = ormap
-			let rootProxy = Proxies.createRootObjectProxy(context)
-
 			expect(ORMap.value(context.doc)).to.deep.equal(
 				{ }
 			)
@@ -137,8 +132,6 @@ describe('test frontend - utility functionality', () => {
 				doc.a = {"b": { "c": 7 }}
 				let tmp = doc.a.b
 				tmp.c = 5
-				// doc.a.b.c = 5
-				// doc.a.b = {"hi": "bye"}
 			}
 			callback(rootProxy)
 			expect(ORMap.value(context.doc)).to.deep.equal(
@@ -234,7 +227,6 @@ describe('test frontend - utility functionality', () => {
 			callback(rootProxy)
 
 			expect(ORMap.value(context.doc).map).to.deep.equal(
-				//{ "array" : [ [ ] ] }
 				{ "array" : [ [ new Set([1]) ] ] }
 			)
 		})
@@ -249,7 +241,6 @@ describe('test frontend - utility functionality', () => {
 			callback(rootProxy)
 
 			expect(ORMap.value(context.doc).map).to.deep.equal(
-				//{ "array" : [ [ ] ] }
 				{ "array" : [ { "a" : new Set([1]) }  ] }
 			)
 		})

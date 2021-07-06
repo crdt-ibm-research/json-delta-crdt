@@ -3,9 +3,9 @@ const dirtyChai = require('dirty-chai')
 const DCRDT = require('../../src/frontend/index')
 
 const { COMPRESSED_DELTAS, UNCOMPRESSED_DELTAS } = require('../../src/frontend/constants')
-const {DotMap, DotFun, DotFunMap} = require('../../src/backend/dotstores/unifiedDotstores')
+const { DotMap } = require('../../src/backend/dotstores/unifiedDotstores')
 const Peeler = require('../../src/frontend/peeler')
-const {ORMap, ORArray, MVReg} = require('../../src/backend/crdts/unifiedCRDTs')
+const { ORMap } = require('../../src/backend/crdts/unifiedCRDTs')
 const CausalContext = require('../../src/backend/causal-context')
 
 const expect = chai.expect
@@ -43,21 +43,18 @@ describe('test frontend public API ', () => {
 
             // Some data is inserted to a remote replica
             let remoteReplica = ORMap.create([null, new CausalContext("R2")])
-            //let remoteReplica =  [new DotMap(ORMap.typename()), new CausalContext("R2")]
+            // Let remoteReplica =  [new DotMap(ORMap.typename()), new CausalContext("R2")]
             let [f, _] = Peeler.genNestedObjectCreation({"hello": {"name": {"key": "abc"}}})
             let delta = ORMap.applyToMap(f, "content", remoteReplica)
             remoteReplica = DotMap.join(remoteReplica, delta)
 
             // We receive the changes
-            console.log("merging insert delta")
             doc = DCRDT.applyChanges(doc, delta)
             expect(doc.content.hello.name.key).to.deep.equal("abc")
             expect(DCRDT.documentValue(doc)).to.deep.equal(
                 {"content": {"hello": {"name": { "key": new Set(["abc"]) }}}}
             )
-
             // Finally, we remove the element
-            console.log("merging remove delta")
             delta = ORMap.remove("content", remoteReplica)
             remoteReplica = DotMap.join(remoteReplica, delta)
             expect(ORMap.value(remoteReplica)).to.deep.equal({})
@@ -87,7 +84,7 @@ describe('test frontend public API ', () => {
                 {"a": {"b": {"hi": new Set(["bye"])} }}
             )
 
-            // do some changes in doc, and propagate them to doc2
+            // Do some changes in doc, and propagate them to doc2
             doc = DCRDT.change(doc, "test", doc => {
                 doc.a.c = {"hi": "bye-2"}
             })
@@ -130,7 +127,7 @@ describe('test frontend public API ', () => {
                 {"a": {"b": {"hi": new Set(["bye"])} }}
             )
 
-            // do some changes in doc, and propagate them to doc2
+            // Do some changes in doc, and propagate them to doc2
             doc = DCRDT.change(doc, "test", doc => {
                 doc.a.c = {"hi": "bye-2"}
             })
