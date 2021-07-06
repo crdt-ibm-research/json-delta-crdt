@@ -1,6 +1,8 @@
 # DSON - JSON CRDT Using Delta-Mutations
 
-Repository for delta based CRDTs supporting JSON data
+Prototype implementation of delta based CRDTs supporting JSON data using Javascript.
+
+The folder `benchmarks` contains the source code for the figures in the paper.
 
 # Disclaimer 
 
