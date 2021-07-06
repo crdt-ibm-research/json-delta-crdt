@@ -9,8 +9,8 @@
     "test:browser": "AEGIR_BROWSERS=Chrome,Firefox aegir test --target browser",
     "lint": "aegir lint"
   },
-  "author": "",
-  "license": "IBM",
+  "author": "IBM",
+  "license": "Apache-2.0",
   "devDependencies": {
     "aegir": "^18.0.3",
     "allcombinations": "^1.1.4",
@@ -22,11 +22,11 @@
     "object-sizeof": "^1.6.1",
     "p-queue": "^3.0.0",
     "pre-commit": "^1.2.2",
+    "prettier": "2.3.2",
     "shuffle-array": "^1.0.1",
     "yjs": "^13.5.4"
   },
   "dependencies": {
-    "delta-crdts-msgpack-codec": "~0.2.0",
     "msgpack5": "^3.6.1",
     "uuid": "^3.4.0"
   },
