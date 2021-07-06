@@ -15,7 +15,7 @@ class Peeler {
   static genNestedObjectCreation(value) {
     if (Array.isArray(value)) {
       let f = function ([m, cc]) {
-        // Create a new map object
+        // Create a new array object
         let newCC = CausalContext.from(cc);
         let deltaArray = ORArray.create([null, newCC]);
         let darray = [new DotMap(ORArray.typename()), newCC];

@@ -154,8 +154,7 @@ const ListHandler = {
       });
     }
 
-    let i;
-    for (i = mutatorsList.length - 1; i >= 0; i--) {
+    for (let i = mutatorsList.length - 1; i >= 0; i--) {
       mutator = mutatorsList[i](mutator);
     }
     const doc = context.doc;
@@ -258,7 +257,10 @@ function MVRProxy(context, wrappedObject, mutatorsList) {
   return new Proxy({ context, wrappedObject, mutatorsList }, MVRHandler);
 }
 
-// @param context: a reference to [m, cc]
+/**
+ * @param context: a reference to [m, cc]
+ * @returns {{mutatorsList: *, context: *, wrappedObject: *}}
+ */
 function createRootObjectProxy(context) {
   const mutatorList = new Array();
   let [m, cc] = context.doc;
