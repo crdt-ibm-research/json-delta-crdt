@@ -8,9 +8,9 @@ const CausalContext = require("../../src/backend/causal-context");
 
 class Peeler {
   /**
-   * Recursively creates Automerge versions of all the objects and nested
+   * Recursively creates DCRDT versions of all the objects and nested
    * objects in `value`, and returns the object ID of the root object. If any
-   * object is an existing Automerge object, its existing ID is returned.
+   * object is an existing DCRDT object, its existing ID is returned.
    */
   static genNestedObjectCreation(value) {
     if (Array.isArray(value)) {
