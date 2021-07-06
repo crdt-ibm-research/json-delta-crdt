@@ -1,13 +1,11 @@
-const {DotMap, DotFun, DotFunMap} = require('../../src/backend/dotstores/unifiedDotstores')
-const {ORMap, ORArray, MVReg} = require('../../src/backend/crdts/unifiedCRDTs')
-const CausalContext = require('../backend/causal-context')
+const { DotMap } = require('../backend/dotstores')
+const {ORMap, ORArray, MVReg} = require('../backend/crdts')
 const Peeler = require('./peeler')
-const { MAP, ARRAY, VALUE } = require('../../src/backend/constants')
+const { MAP, ARRAY, VALUE } = require('../backend/utils/constants')
 const { BACKEND } = require('../../src/frontend/constants')
 
 const JsonArray = require('../../src/backend/JsonObjects/JsonArray')
 const JsonMap = require('../../src/backend/JsonObjects/JsonMap')
-const JsonRegister = require('../../src/backend/JsonObjects/JsonRegister')
 
 const MVRHandler = {}
 

@@ -2,9 +2,9 @@ const msgpack = require('msgpack5')()
 const { BACKEND, REPLICA_ID } = require('../../src/frontend/constants')
 const DCRDT = require('../../src/frontend/index')
 
-const CustomSet = require('../../src/backend/custom-set')
+const CustomSet = require('../../src/backend/utils/custom-set')
 const CausalContext = require('../../src/backend/causal-context')
-const {DotMap, DotFun, DotFunMap} = require('../../src/backend/dotstores/unifiedDotstores')
+const {DotMap, DotFun, DotFunMap} = require('../backend/dotstores')
 
 msgpack.register(0x40, Map, encodeMap, decodeMap)
 msgpack.register(0x41, Set, encodeSet, decodeSet)

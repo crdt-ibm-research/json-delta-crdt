@@ -1,12 +1,10 @@
-const {DotMap, DotFun, DotFunMap} = require('../../src/backend/dotstores/unifiedDotstores')
-const {ORMap, ORArray, MVReg} = require('../../src/backend/crdts/unifiedCRDTs')
+const { DotMap } = require('../backend/dotstores')
+const {ORMap, ORArray, MVReg} = require('../backend/crdts')
 const JsonArray = require('../../src/backend/JsonObjects/JsonArray')
 const JsonMap = require('../../src/backend/JsonObjects/JsonMap')
 const JsonRegister = require('../../src/backend/JsonObjects/JsonRegister')
 
-const Position = require('../../src/backend/position')
 const CausalContext = require('../../src/backend/causal-context')
-const { VALUE } = require('../../src/backend/constants')
 
 class Peeler {
     constructor() {

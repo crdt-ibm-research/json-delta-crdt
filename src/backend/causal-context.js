@@ -1,7 +1,6 @@
 'use strict'
 
-const CustomSet = require('./custom-set')
-const uuid = require('./uuid')
+const CustomSet = require('./utils/custom-set')
 const { assert } = require('chai');
 
 // Autonomous causal context, for context sharing in maps

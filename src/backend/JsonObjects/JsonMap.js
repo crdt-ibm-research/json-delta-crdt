@@ -1,7 +1,6 @@
 'use strict'
 
-//const ORMap = require("../crdts/ormap")
-const { ORMap } = require("../crdts/unifiedCRDTs")
+const { ORMap } = require("../crdts")
 
 class JsonMap {
 

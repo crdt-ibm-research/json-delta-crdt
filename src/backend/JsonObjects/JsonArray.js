@@ -1,13 +1,11 @@
 'use strict'
 
-
-//const ORArray = require("../crdts/orarray")
-const { ORArray } = require("../crdts/unifiedCRDTs")
-const Position = require("../position")
+const { ORArray } = require("../crdts")
+const Position = require("../utils/position")
 const { assert } = require('chai');
-const { DotMap, DotFunMap, DotFun } = require('../dotstores/unifiedDotstores');
+const { DotMap } = require('../dotstores');
 const CausalContext = require("../causal-context");
-const { ALIVE, FIRST, SECOND } = require("../constants");
+const { ALIVE, SECOND } = require("../utils/constants");
 
 class JsonArray {
     static value(state) {
@@ -20,7 +18,6 @@ class JsonArray {
     }
 
     static insertMap(o, idx) {
-        // TODO: Get position and uid from p
         return function([m,cc]) {
             const uid = cc.next()
             const p = _createPositionForIndex([m, cc], idx)
@@ -29,7 +26,6 @@ class JsonArray {
     }
 
     static insertArray(o, idx) {
-        // TODO: Get position and uid from p
         return function([m,cc]) {
             const uid = cc.next()
             const p = _createPositionForIndex([m, cc], idx)
@@ -38,7 +34,6 @@ class JsonArray {
     }
 
     static insertValue(o, idx) {
-        // TODO: Get position and uid from p
         return function([m,cc]) {
             const uid = cc.next()
             const p = _createPositionForIndex([m, cc], idx)
@@ -47,55 +42,42 @@ class JsonArray {
     }
 
     static applyToMap(o, idx) {
-        // TODO: Get position and uid from p
         return function([m,cc]) {
             const uid = _uidFromIndex([m, cc], idx)
             const p = _getPosFromIndex([m, cc], idx)
             return ORArray.applyToMap(uid, o ,p, [m,cc])
         }
-        return function([m,cc]) { return ORArray.applyToMap(uid, o ,p, [m,cc]) }
     }
 
     static applyToArray(o, idx) {
-        // TODO: Get position and uid from p
         return function([m,cc]) {
             const uid = _uidFromIndex([m, cc], idx)
             const p = _getPosFromIndex([m, cc], idx)
             return ORArray.applyToArray(uid, o ,p, [m,cc])
         }
-        return function([m,cc]) { 
-            return ORArray.applyToArray(uid, o ,p, [m,cc]) 
-        }
     }
 
     static applyToValue(o, idx) {
-        // TODO: Get position and uid from p
         return function([m,cc]) {
             const uid = _uidFromIndex([m, cc], idx)
             const p = _getPosFromIndex([m, cc], idx)
             return ORArray.applyToValue(uid, o ,p, [m,cc])
         }
-        return function([m,cc]) { return ORArray.applyToValue(uid, o ,p, [m,cc]) }
     }
 
     static move(from, to) {
-
-        // TODO: Get uid from from and get position from to
         return function([m,cc]) {
             const uid = _uidFromIndex([m, cc], from)
             const p = _createPositionForIndex([m, cc], to)
             return ORArray.move(uid, p, [m,cc])
         }
-        return function([m,cc]) { return ORArray.move(uid,p, [m,cc]) }
     }
 
     static delete(idx) {
-        //TODO: Get uid from p
         return function([m,cc]) {
             const uid = _uidFromIndex([m, cc], idx)
             return ORArray.delete(uid, [m,cc])
         }
-        return function([m,cc]) { return ORArray.delete(uid, [m,cc]) }
     }
 
     static clear() {

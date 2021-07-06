@@ -3,9 +3,9 @@ const dirtyChai = require('dirty-chai')
 const DCRDT = require('../../src/frontend/index')
 
 const { COMPRESSED_DELTAS, UNCOMPRESSED_DELTAS } = require('../../src/frontend/constants')
-const {DotMap, DotFun, DotFunMap} = require('../../src/backend/dotstores/unifiedDotstores')
+const { DotMap } = require('../../src/backend/dotstores')
 const Peeler = require('../../src/frontend/peeler')
-const {ORMap, ORArray, MVReg} = require('../../src/backend/crdts/unifiedCRDTs')
+const { ORMap } = require('../../src/backend/crdts')
 const CausalContext = require('../../src/backend/causal-context')
 
 const expect = chai.expect

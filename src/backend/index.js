@@ -1,16 +1,11 @@
 'use strict'
 
-const uuid = require('./uuid')
-const { ORMap } = require('./crdts/unifiedCRDTs')
+const uuid = require('./utils/uuid')
+const { ORMap } = require('./crdts')
 
 const CausalContext = require('./causal-context')
 
-const { DotMap, DotFunMap, DotFun } = require('./dotstores/unifiedDotstores')
-// const DotFun = require('./dotstores/dot-fun')
-// const DotFunMap = require('./dotstores/dot-fun-map')
-// const DotMap = require('./dotstores/dot-map')
-
-//const ORMap = require('./crdts/ormap')
+const { DotMap, DotFunMap, DotFun } = require('./dotstores')
 
 class Backend {
     constructor(id, dotstore, cc, type = ORMap.typename()) {

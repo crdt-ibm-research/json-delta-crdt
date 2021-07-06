@@ -1,6 +1,6 @@
 'use strict'
 
-// Logoot implementation (not optimized and not really tested)
+// Logoot implementation (not optimized)
 
 const LOWER = 0
 const UPPER = 32767

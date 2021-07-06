@@ -5,10 +5,10 @@ const chai = require('chai')
 const dirtyChai = require('dirty-chai')
 const expect = chai.expect
 chai.use(dirtyChai)
-const uuid = require('../../../src/backend/uuid')
+const uuid = require('../../../src/backend/utils/uuid')
 
-const MVReg = require('../../../src/backend/crdts/mvreg')
-const DotFun = require('../../../src/backend/dotstores/dot-fun')
+const { MVReg } = require('../../../src/backend/crdts')
+const { DotFun }  = require('../../../src/backend/dotstores')
 const CausalContext = require('../../../src/backend/causal-context')
 
 describe('mvreg', () => {

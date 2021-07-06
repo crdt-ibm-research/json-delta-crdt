@@ -2,8 +2,8 @@ const Backend = require('../../src/backend/index')
 const CausalContext = require('../../src/backend/causal-context')
 const Proxies = require('../../src/frontend/proxies')
 const { BACKEND, DELTAS, DELTAS_CACHE_MODE, COMPRESSED_DELTAS, UNCOMPRESSED_DELTAS, REPLICA_ID } = require('../../src/frontend/constants')
-const {DotMap, DotFun, DotFunMap} = require('../../src/backend/dotstores/unifiedDotstores')
-const { ORMap } = require('../../src/backend/crdts/unifiedCRDTs')
+const { DotMap } = require('../backend/dotstores')
+const { ORMap } = require('../backend/crdts')
 
 function getBackend(frontend) {
   return frontend[BACKEND]

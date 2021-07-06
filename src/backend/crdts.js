@@ -2,24 +2,247 @@
 
 const { assert } = require('chai')
 
-const DotMap = require('../dotstores/dot-map')
-const CausalContext = require('../causal-context')
-const MVReg = require('./mvreg')
-const { ALIVE, FIRST, SECOND, MAP, ARRAY, VALUE } = require('../constants')
-const DotFun = require('../dotstores/dot-fun')
-const DotFunMap = require('../dotstores/dot-fun-map')
-const ORMap = require('./ormap')
+const CausalContext = require('./causal-context')
+const { DotMap, DotFunMap, DotFun } = require('./dotstores')
+const { ALIVE, FIRST, SECOND, MAP, ARRAY, VALUE } = require('./utils/constants')
+const Position = require('./utils/position')
+
+class MVReg {
+  static typename() {
+    return "mvreg"
+  }
+
+  getTypeName() {
+  	return MVReg.typename()
+  }
+
+  static values([m, c]) {
+    const ret = new Set()
+    for (let [, value] of m.items()) {
+      ret.add(value)
+    }
+    return ret
+  }
+
+  // returns the value of the MVReg solving conlicts according to:
+  // dot is [String, Integer], so first largest Integer then largest String
+  static value([m, c]) {
+    const max_dot = [...m.dots()].reduce(CausalContext.maxDot)
+    return m.get(max_dot)
+  }
+
+  static write(value, [m, c]) {
+
+	assert (c instanceof CausalContext)
+    // handle undefined
+    m = m || new DotFun(MVReg.typename())
+    const dot = c.next()
+    const newState = new DotFun(m.typename).set(dot, value)
+    const newCC = new CausalContext(c.getID()).insertDot(dot).insertDots(m.dots())
+    return [newState, newCC]
+  }
+
+  static clear([m, c]) {
+    return [new DotFun(m.typename), new CausalContext().insertDots(m.dots())]
+  }
+}
+
+class ORMap {
+	static typename() {
+		return "or-map"
+	}
+
+	getTypeName() {
+		return ORMap.typename()
+	}
+
+	static getKey(m, key) {
+		const innerMap = m.get(key)
+		if (innerMap.has(MAP)) {
+			return [innerMap.get(MAP), MAP]
+		} else if (innerMap.has(ARRAY)) {
+			return [innerMap.get(ARRAY), ARRAY]
+		} else {
+			return [innerMap.get(VALUE), VALUE]
+		}
+	}
+
+	static value(target) {
+		const [m, cc] = target
+		assert(m instanceof DotMap)
+
+		let retMap = {}
+
+		for (let [key, value] of m.state.entries()) {
+			if (key === ALIVE) continue
+			const innerMap = m.get(key)
+			if (innerMap.has(MAP)) {
+				value = ORMap.value([innerMap.get(MAP), cc])
+			} else if (innerMap.has(ARRAY)) {
+				value = ORArray.value([innerMap.get(ARRAY), cc])
+			} else {
+				value = MVReg.values([innerMap.get(VALUE), cc])
+			}
+
+			retMap[key] = value
+		}
+		return retMap
+	}
+
+	static create([m,cc]) {
+		m = m || new DotMap(ORMap.typename())
+
+		assert(m instanceof DotMap)
+		assert(cc instanceof CausalContext)
+		
+		const [retFun, retCC] = MVReg.write(true, [m.get(ALIVE), cc])
+		const retDotMap = new DotMap(ORMap.typename(), new Map().set(ALIVE, retFun))
+
+		return [retDotMap, retCC]
+	}
+
+	static applyToMap(o, k, [m,cc]) {
+		const inner = function ([state,causalContext]) {return ORMap.apply(o, MAP, [state, causalContext])}
+		const [retMap, retCC] = ORMap.apply(inner, k, [m,cc])
+		// Recommitted a map, delete the other two
+		if (m && m.get(k) && m.get(k).get(ARRAY)) {
+			retCC.insertDots(m.get(k).get(ARRAY).dots())
+		}
+		if (m && m.get(k) && m.get(k).get(VALUE)) {
+			retCC.insertDots(m.get(k).get(VALUE).dots())
+		}
+		return [retMap, retCC]
+	}
+
+	static applyToArray(o, k, [m,cc]) {
+		const inner = function ([m,cc]) {return ORMap.apply(o, ARRAY, [m, cc])}
+		const [retMap, retCC] = ORMap.apply(inner, k, [m,cc])
+		
+	    // Recommitted an array, delete the other two
+		if (m && m.get(k) && m.get(k).get(MAP)) {
+			retCC.insertDots(m.get(k).get(MAP).dots())
+		}
+		if (m && m.get(k) && m.get(k).get(VALUE)) {
+			retCC.insertDots(m.get(k).get(VALUE).dots())
+		}
+
+		return [retMap, retCC]
+	}
+
+	static applyToValue(o, k, [m,cc]) {
+		const inner = function ([m,cc]) {return ORMap.apply(o, VALUE, [m, cc])}
+		const [retMap, retCC] = ORMap.apply(inner, k, [m,cc])
+		
+		// Recommitted a value, delete the other two
+		if (m && m.get(k) && m.get(k).has(MAP)) {
+			retCC.insertDots(m.get(k).get(MAP).dots())
+		}
+		if (m && m.get(k) && m.get(k).has(ARRAY)) {
+			retCC.insertDots(m.get(k).get(ARRAY).dots())
+		}
+
+		return [retMap, retCC]
+	}
+
+	static apply(o, k, [m,cc]) {
+		m = m || new DotMap(ORMap.typename())
+
+		assert(m instanceof DotMap)
+		assert(m.typename === ORMap.typename())
+		assert(cc instanceof CausalContext)
+
+		const tmpCC = CausalContext.from(cc)
+
+		const retDotMap = new DotMap(ORMap.typename())
+
+		// First add ALIVE
+		const [fun, funCC] = MVReg.write(true, [m.get(ALIVE), tmpCC])
+		retDotMap.set(ALIVE, fun)
+
+		// Next call o (don't forget to add the dot to the CC)
+		const [newV, retCC] = o([m.get(k), tmpCC.join(funCC)])
+		retDotMap.set(k ,newV)
+
+		return [retDotMap, retCC.join(funCC)]
+	}
+
+	static remove(k, [m,cc]) {
+		if (!m || !m.get(k)) {
+			return [new DotMap(ORMap.typename()), new CausalContext()]
+		}
+
+		assert(cc instanceof CausalContext)
+		assert(m instanceof DotMap)
+
+		const retCC = new CausalContext().insertDots(m.get(k).dots())
+		return [new DotMap(ORMap.typename()), retCC]
+	}
+
+	static clear([m,cc]) {        
+		assert(m instanceof DotMap)
+		assert(cc instanceof CausalContext)
+
+		const retDotMap = new DotMap(ORMap.typename())
+
+		// First write ALIVE
+		const [fun, funCC] = MVReg.write(true, [m.get(ALIVE), cc])
+		retDotMap.set(ALIVE, fun)
+
+		// Next remove all dots
+		const retCC = funCC.insertDots(m.dots())
+
+		return [retDotMap, retCC]
+	}
+}
 
 class ORArray {
 	static typename() {
 		return "or-array"
 	}
 
+	getTypeName() {
+		return ORArray.typename()
+	}
+
+	static getIdx(m, idx) {
+		const result = []
+		for (let [uid, pair] of m.state.entries()) {
+            // get value
+			if (uid === ALIVE) continue
+            const innerMap = pair.get(FIRST)
+            let v
+            if (innerMap.has(MAP)) {
+				v = [innerMap.get(MAP), MAP]
+			} else if (innerMap.has(ARRAY)) {
+				v = [innerMap.get(ARRAY), ARRAY]
+			} else {
+				v = [innerMap.get(VALUE), VALUE]
+            }
+
+            // get position
+            const maxRoot = pair.get(SECOND).keys().reduce(CausalContext.maxDot)
+            const maxDot = pair.get(SECOND).get(maxRoot).keys().reduce(CausalContext.maxDot)
+            const p = pair.get(SECOND).get(maxRoot).get(maxDot)
+
+			result.push([v, p])
+        }
+	
+		result.sort((a, b) => Position.compare(a[1], b[1]))
+
+        // sort the array
+        let retArray = []
+        for (let [v, p] of result) {
+            retArray.push(v)
+        }
+
+		return retArray[idx]
+	}
+
 	static value([m, cc]) {
         assert(m instanceof DotMap)
         assert(cc instanceof CausalContext)
 
-        let tmpArray = []
+        const result = []
 		for (let [uid, pair] of m.state.entries()) {
             // get value
             if (uid === ALIVE) continue
@@ -28,7 +251,7 @@ class ORArray {
             if (innerMap.has(MAP)) {
 				v = ORMap.value([innerMap.get(MAP), cc])
 			} else if (innerMap.has(ARRAY)) {
-				v = ORArray.values([innerMap.get(ARRAY), cc])
+				v = ORArray.value([innerMap.get(ARRAY), cc])
 			} else {
 				v = MVReg.values([innerMap.get(VALUE), cc])
             }
@@ -38,12 +261,14 @@ class ORArray {
             const maxDot = pair.get(SECOND).get(maxRoot).keys().reduce(CausalContext.maxDot)
             const p = pair.get(SECOND).get(maxRoot).get(maxDot)
 
-			tmpArray.push([v, p])
+			result.push([v, p])
         }
+	
+		result.sort((a, b) => Position.compare(a[1], b[1]))
 
         // sort the array
         let retArray = []
-        for (let [v, p] of tmpArray.sort((a, b) => a[1] - b[1])) {
+        for (let [v, p] of result) {
             retArray.push(v)
         }
 
@@ -190,9 +415,6 @@ class ORArray {
         assert(cc instanceof CausalContext)
 
         const d = CausalContext.from(cc).next()
-        //const children = m.get(uid).get(SECOND).values().reduce(function(a, b) {
-        //    new CausalContext().insertDots(a.dots()).join(new CausalContext().insertDots(b.dots()))
-        //})
         const children = m.get(uid).get(SECOND).dots()
 
         const ps = new DotFunMap()
@@ -229,4 +451,4 @@ class ORArray {
 	}
 }
 
-module.exports = ORArray
+module.exports = {ORMap, MVReg , ORArray}

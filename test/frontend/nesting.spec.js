@@ -9,10 +9,9 @@ chai.use(dirtyChai)
 const Peeler = require('../../src/frontend/peeler')
 const Proxies = require('../../src/frontend/proxies')
 
-const {DotMap, DotFun, DotFunMap} = require('../../src/backend/dotstores/unifiedDotstores')
-const {ORMap, ORArray, MVReg} = require('../../src/backend/crdts/unifiedCRDTs')
+const { DotMap } = require('../../src/backend/dotstores')
+const { ORMap } = require('../../src/backend/crdts')
 const CausalContext = require('../../src/backend/causal-context')
-const { VALUE } = require('../../src/backend/constants')
 
 describe('test frontend - utility functionality', () => {
 	describe('check nesting map', () => {

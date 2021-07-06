@@ -7,11 +7,10 @@ const expect = chai.expect
 chai.use(dirtyChai)
 
 
-const DotMap = require('../../../src/backend/dotstores/dot-map')
-const ORMap = require('../../../src/backend/crdts/ormap')
+const { DotMap } = require('../../../src/backend/dotstores')
+const { ORMap, MVReg } = require('../../../src/backend/crdts')
 const CausalContext = require('../../../src/backend/causal-context')
-const MVReg = require('../../../src/backend/crdts/mvreg')
-const { VALUE } = require('../../../src/backend/constants')
+const { VALUE } = require('../../../src/backend/utils/constants')
 
 describe('ormap', () => {
 	describe('local', () => {

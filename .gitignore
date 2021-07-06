@@ -3,3 +3,4 @@ node_modules
 .npmrc
 .nyc_output/
 coverage.lcov
+.DS_Store

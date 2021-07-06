@@ -1,6 +1,6 @@
 'use strict'
 
-const CausalContext = require('../causal-context')
+const CausalContext = require('./causal-context')
 const { assert } = require('chai');
 
 class DotFun {

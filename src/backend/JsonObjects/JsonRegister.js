@@ -1,8 +1,6 @@
 'use strict'
 
-//const MVReg = require("../crdts/mvreg")
-
-const { MVReg } = require("../crdts/unifiedCRDTs")
+const { MVReg } = require("../crdts")
 
 class JsonRegister {
 
