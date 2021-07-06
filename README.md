@@ -1,4 +1,4 @@
-# json-delta-crdt
+# DSON - JSON CRDT Using Delta-Mutations
 
 Repository for delta based CRDTs supporting JSON data
 
