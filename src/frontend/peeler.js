@@ -1,5 +1,5 @@
 const { DotMap } = require('../backend/dotstores')
-const {ORMap, ORArray, MVReg} = require('../backend/crdts')
+const {ORMap, ORArray} = require('../backend/crdts')
 const JsonArray = require('../../src/backend/JsonObjects/JsonArray')
 const JsonMap = require('../../src/backend/JsonObjects/JsonMap')
 const JsonRegister = require('../../src/backend/JsonObjects/JsonRegister')
@@ -7,15 +7,10 @@ const JsonRegister = require('../../src/backend/JsonObjects/JsonRegister')
 const CausalContext = require('../../src/backend/causal-context')
 
 class Peeler {
-    constructor() {
-        // maps UUID to (parent-uuid, parent-type, my-identifier-in-parent)
-        this.backtrackMap = new Map()
-    }
-    
-    /**
+  /**
    * Recursively creates Automerge versions of all the objects and nested
    * objects in `value`, and returns the object ID of the root object. If any
-   * object is an existing Automerge object, its existing ID is returned.
+   * object is an existing Automerge object, its existing ID is returned. 
    */
   static genNestedObjectCreation(value) {
     if (Array.isArray(value)) {
@@ -74,19 +69,6 @@ class Peeler {
     } else {
         return [JsonRegister.write(value), "primitive"]
     }
-  }
-
-  static genSetValue(value) {
-      if (isObject(value)) {
-          // another nesting, get the creation func
-          return Peeler.genNestedObjectCreation(value)
-      } else {
-          // we have a primitive
-          const f = function ([m,cc]) {
-                return MVReg.write(value, [m,cc])	
-            }
-        return [f, "primitive"]    
-      }
   }
 }
 

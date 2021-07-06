@@ -20,14 +20,14 @@ function createBottomDelta(frontend) {
 /**
  * @param frontend: doc (returned from init, change or applyChanges methods)
  * @param delta: a delta created locally by the change method or delta received from the a remote replica
- * @returns merge of all deltas in cache. Note that this function doesn't change the state or the cache (as the cache will be empties shortly)
+ * @returns List of all deltas currently stored in the cache. These deltas are either compressed into a single delta or stored separately.
  */
 function addDeltaToCache(frontend, delta) {
   if (frontend[DELTAS_CACHE_MODE] == COMPRESSED_DELTAS) {
     let existingDelta = frontend[DELTAS][0]
     frontend[DELTAS][0] = DotMap.join(existingDelta, delta)
   } else if (frontend[DELTAS_CACHE_MODE] == UNCOMPRESSED_DELTAS){
-    // we compress only in the end
+    // In this mode the deltas are compressed in a lazy manner
     frontend[DELTAS].push(delta)
   }
 }

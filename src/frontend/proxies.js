@@ -16,9 +16,6 @@ const MVRHandler = {}
  *  console.log(d.values())
  */
 
-
-// wrappedObject == m (not cc)
-// context = {doc: [m, cc] } where m is the top level document
 const MapHandler = {
     get (target, key) {
         let { context, wrappedObject, mutatorsList, isRoot } = target

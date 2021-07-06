@@ -43,13 +43,11 @@ describe('test frontend public API ', () => {
 
             // Some data is inserted to a remote replica
             let remoteReplica = ORMap.create([null, new CausalContext("R2")])
-            //let remoteReplica =  [new DotMap(ORMap.typename()), new CausalContext("R2")]
             let [f, _] = Peeler.genNestedObjectCreation({"hello": {"name": {"key": "abc"}}})
             let delta = ORMap.applyToMap(f, "content", remoteReplica)
             remoteReplica = DotMap.join(remoteReplica, delta)
 
             // We receive the changes
-            console.log("merging insert delta")
             doc = DCRDT.applyChanges(doc, delta)
             expect(doc.content.hello.name.key).to.deep.equal("abc")
             expect(DCRDT.documentValue(doc)).to.deep.equal(
@@ -57,7 +55,6 @@ describe('test frontend public API ', () => {
             )
 
             // Finally, we remove the element
-            console.log("merging remove delta")
             delta = ORMap.remove("content", remoteReplica)
             remoteReplica = DotMap.join(remoteReplica, delta)
             expect(ORMap.value(remoteReplica)).to.deep.equal({})
@@ -87,7 +84,7 @@ describe('test frontend public API ', () => {
                 {"a": {"b": {"hi": new Set(["bye"])} }}
             )
 
-            // do some changes in doc, and propagate them to doc2
+            // Do some changes in doc, and propagate them to doc2
             doc = DCRDT.change(doc, "test", doc => {
                 doc.a.c = {"hi": "bye-2"}
             })
@@ -106,7 +103,7 @@ describe('test frontend public API ', () => {
 
             delta = DCRDT.getChanges(doc)
             doc2 = DCRDT.applyChanges(doc2, delta)
-            // TODO: Check how to compare entire array at once
+            // TODO: compare entire array at once
             expect(doc2.arr[0]).to.deep.equal(0)
             expect(doc2.arr[1]).to.deep.equal(1)
             expect(doc2.arr[2]).to.deep.equal(2)
@@ -130,7 +127,7 @@ describe('test frontend public API ', () => {
                 {"a": {"b": {"hi": new Set(["bye"])} }}
             )
 
-            // do some changes in doc, and propagate them to doc2
+            // Do some changes in doc, and propagate them to doc2
             doc = DCRDT.change(doc, "test", doc => {
                 doc.a.c = {"hi": "bye-2"}
             })
