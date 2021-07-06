@@ -1,9 +1,6 @@
 const util = require('util')
-
-// for verifying encode/decode
 const chai = require('chai')
 const dirtyChai = require('dirty-chai')
-const expect = chai.expect
 chai.use(dirtyChai)
 
 const Automerge = require('automerge')
@@ -41,17 +38,7 @@ function initTest(nReplicas, [deltaInit, autoInit, yjsInit]) {
     return [deltaDocs, autoDocs, yjsDocs]
 }
 
-function wait(ms){
-    var start = new Date().getTime();
-    var end = start;
-    while(end < start + ms) {
-      end = new Date().getTime();
-   }
- }
-
 function runIter(nReplicas, [deltaTest, autoTest, yjsTest], iter, [deltaDocs, autoDocs, yjsDocs], log = false) {
-    //[deltaDocs, autoDocs, yjsDocs] = initTest(nReplicas, deltaInit, autoInit, yjsInit)
-
     for (let i = 0; i < iter; i++) {
         // Get random replica
         const replica = Math.floor(Math.random() * nReplicas)
@@ -60,11 +47,6 @@ function runIter(nReplicas, [deltaTest, autoTest, yjsTest], iter, [deltaDocs, au
         deltaDocs[replica] = deltaTest(deltaDocs[replica], i)
         autoDocs[replica] = autoTest(autoDocs[replica], i)
         yjsDocs[replica] = yjsTest(yjsDocs[replica], i)
-
-        /*
-        if (i == iter - 2) {
-            wait(60 * 1000);
-        }*/
 
         // Merge all
         const yjsState = Y.encodeStateAsUpdateV2(yjsDocs[replica])
@@ -109,16 +91,6 @@ function _runTest(nReplicas, testFuns, initFuns, n, log = false) {
         let docAutomergeInspection = Automerge.save(autoDocs[0]).length
         let docYjsInspection = Y.encodeStateAsUpdateV2(yjsDocs[0]).byteLength
         console.log(`${i}, ${docDeltaInspection},${docAutomergeInspection},${docYjsInspection}`)
-
-        /*
-        for (let r = 0; r < nReplicas; r++) {
-            let docDeltaInspection = Encoder.encodeFrontend(deltaDocs[r]).byteLength
-            let docAutomergeInspection = Automerge.save(autoDocs[r]).length
-            let docYjsInspection = Y.encodeStateAsUpdateV2(yjsDocs[r]).byteLength
-            console.log(`Replica ${r}:, ${docDeltaInspection},${docAutomergeInspection},${docYjsInspection}`)
-        }
-        */
-        
     }
 }
 

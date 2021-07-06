@@ -1,17 +1,12 @@
-const util = require('util')
-
 // for verifying encode/decode
 const chai = require('chai')
 const dirtyChai = require('dirty-chai')
-const expect = chai.expect
 chai.use(dirtyChai)
 
 const Automerge = require('automerge')
 const Y = require('yjs')
 
 const DCRDT = require('../../src/frontend/index')
-const Encoder = require('../../src/frontend/encoder')
-
 const { runTest } = require('./runBenchmark')
 
 
@@ -36,9 +31,6 @@ function yjsInit() {
     docYjs.getMap('a').set('b', 0)
     return docYjs
 }
-
-let deltaFlag = true, autoFlag = true, yjsFlag = true
-
 
 function deltaTest(doc, i) {
     key = `${i - (i % 2)}`
@@ -82,4 +74,4 @@ function yjsTest(doc, i) {
 
 }
 
-runTest([2,3,6, 20], [deltaTest, autoTest, yjsTest], [deltaInit, autoInit, yjsInit], 8192*2)
+runTest([2,3,6,20], [deltaTest, autoTest, yjsTest], [deltaInit, autoInit, yjsInit], 8192*2)
