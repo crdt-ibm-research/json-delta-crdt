@@ -1,3 +1,16 @@
-Xskipper
+DSON
 Copyright 2021 IBM Corp.
 SPDX-License-Identifier: Apache-2.0
+
+-----
+
+Automerge
+Copyright (c) 2017-2021 Martin Kleppmann, Ink & Switch LLC, and the Automerge contributors
+
+----
+
+Yjs
+The MIT License (MIT)
+Copyright (c) 2014
+  - Kevin Jahns <kevin.jahns@rwth-aachen.de>.
+  - Chair of Computer Science 5 (Databases & Information Systems), RWTH Aachen University, Germany
