@@ -36,7 +36,7 @@
 std::vector<Replica> replicaVec;
 int N = 5;
 std::atomic<int> counter;
-std::atomic<bool> wait;
+std::atomic<bool> mywait;
 std::atomic<bool> myexit;
 float P = 0.4f;// Probability of move
 int size = 10;
@@ -61,7 +61,7 @@ void runReplica(const int& replicaId) {
 	thread_local std::uniform_int_distribution<int> uid;
 	Replica& r = replicaVec[replicaId];
 	while (!myexit.load()) {
-		while (!myexit.load() && !wait.load()) {
+		while (!myexit.load() && !mywait.load()) {
 			int idx = uid(rng, decltype(uid)::param_type{ 0, size-1 });
 			float p = urd(rng, decltype(urd)::param_type{ 0,1 });
 			DELTA_POS d;
@@ -75,7 +75,7 @@ void runReplica(const int& replicaId) {
 			r.try_handle_all();
 		}
 		counter++;
-		while (wait.load());
+		while (mywait.load());
 	}
 }
 
@@ -84,7 +84,7 @@ int main(int argc, char* argv[])
 	try {
 		counter.store(0);
 		myexit.store(false);
-		wait.store(false);
+		mywait.store(false);
 		unsigned int ms_wait = 500;
 		unsigned int total_test = 1000;
 
@@ -128,12 +128,12 @@ int main(int argc, char* argv[])
 
 		for (int i = 0; i < num_iters; i++) {
 			std::this_thread::sleep_for(wait_time);
-			wait.store(true);
+			mywait.store(true);
 			int _s = replicaVec[0].size();
 			while (counter.load() != N);
 			//std::cout << "i: " << i << ", size:" << _s << '\n';
 			counter.store(0);
-			wait.store(false);
+			mywait.store(false);
 		}
 
 		myexit.store(true);
