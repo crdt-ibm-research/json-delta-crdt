@@ -2,7 +2,9 @@
 
 Prototype implementation of delta based CRDTs supporting JSON data using Javascript.
 
-The folder `benchmarks` contains the source code for the figures in the paper.
+The folder `benchmarks` contains the source code for the figures in the paper:
+
+- [Figure 14 - Consecutively inserting and deleting an array in an array](benchmarks/array_update_delete_array.js)
 
 # Disclaimer
 
