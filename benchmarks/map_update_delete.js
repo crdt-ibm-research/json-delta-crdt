@@ -1,3 +1,8 @@
+/* 
+  Consecutively updating and deleting an element in a map.
+  Creates Figure 10.
+*/
+
 const { runTest } = require("./runBenchmark");
 
 function mapTest(lib, doc1, n) {

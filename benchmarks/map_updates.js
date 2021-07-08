@@ -1,3 +1,8 @@
+/* 
+  Consecutively updating an element in a map.
+  Creates Figure 9.
+*/
+
 const { runTest } = require("./runBenchmark");
 
 function mapTest(lib, doc1, n) {
