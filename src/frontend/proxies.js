@@ -100,12 +100,61 @@ const MapHandler = {
 const ListHandler = {
   get(target, prop) {
     let { context, wrappedObject, mutatorsList, isRoot } = target;
+    const [m, cc] = context.doc;
+    if (prop === "sort") {
+      let orarray = [wrappedObject, cc]
+      let length = ORArray.length(orarray)
+      let indices = [...Array(length).keys()]
+      let values = ORArray.value(orarray, false)
+      let sortedIndices = indices.sort((i,j) => values[i] - values[j])
+
+      for (let idx = length - 1; idx >= 0; idx--) {
+        // mutatorsList.push(function (f) {
+        //   return JsonArray.move(idx, indices[idx])
+        // });
+        let currIdx = sortedIndices[idx]
+        let mutator = JsonArray.move(currIdx, 0)
+        for (let i = mutatorsList.length - 1; i >= 0; i--) {
+          mutator = mutatorsList[i](mutator);
+        }
+        for (let j = 0; j < sortedIndices.length; j++) {
+          if (sortedIndices[j] < currIdx) {
+            sortedIndices[j] = sortedIndices[j] + 1
+          }          
+        }
+        const doc = context.doc;
+        let delta = mutator(doc);
+        context.delta = delta;
+        context.doc = DotMap.join(doc, delta);
+      }
+
+      // for (let i = mutatorsList.length - 1; i >= 0; i--) {
+      //   mutator = mutatorsList[i](mutator);
+      // }
+      // const doc = context.doc;
+      // let delta = mutator(doc);
+      // context.delta = delta;
+      // context.doc = DotMap.join(doc, delta);
+      
+      let ormap = ORMap.value(context.doc)
+
+      return values.sort
+    }
+
+    if (prop === "length") {
+      let orarray = [wrappedObject, cc]
+      return ORArray.length(orarray)
+    }
+
+    let idx = parseInt(prop)
+    if (! isNaN(idx)) {
+      return ORArray.value([wrappedObject, cc], false)[idx]
+    }
     if (isRoot) {
-      const [m, cc] = context.doc;
       wrappedObject = m;
       mutatorsList = new Array();
     }
-    let [val, type] = ORArray.getIdx(wrappedObject, prop);
+    let [val, type] = ORArray.value(context);
     if (type === MAP) {
       mutatorsList.push(function (f) {
         return JsonArray.applyToMap(f, prop);

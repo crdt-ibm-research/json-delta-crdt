@@ -23,6 +23,10 @@ describe("orarray", () => {
       expect(ORArray.value(orarray)).to.deep.equal([]);
     });
 
+    it("length is zero", () => {
+      expect(ORArray.length(orarray)).to.equal(0);
+    });
+
     it("can apply a causal CRDT", () => {
       const writeA = function ([m, cc]) {
         return MVReg.write("a", [m, cc]);
@@ -31,6 +35,10 @@ describe("orarray", () => {
 
       orarray = DotMap.join(orarray, d1);
       expect(ORArray.value(orarray)).to.deep.equal([new Set(["a"])]);
+    });
+
+    it("length is now one", () => {
+      expect(ORArray.length(orarray)).to.equal(1);
     });
 
     it("can apply a causal CRDT again", () => {
@@ -47,6 +55,10 @@ describe("orarray", () => {
       const delta = ORArray.delete("a", orarray);
       orarray = DotMap.join(orarray, delta);
       expect(ORArray.value(orarray)).to.deep.equal([]);
+    });
+
+    it("length is now zero again", () => {
+      expect(ORArray.length(orarray)).to.equal(0);
     });
 
     it("can move", () => {

@@ -112,4 +112,5 @@ module.exports = {
   applyChanges,
   from,
   getChanges,
+  getBackend,
 };

@@ -8,11 +8,16 @@ const {
 } = require("../../src/frontend/constants");
 const { DotMap } = require("../../src/backend/dotstores");
 const Peeler = require("../../src/frontend/peeler");
-const { ORMap } = require("../../src/backend/crdts");
+const { ORMap, ORArray } = require("../../src/backend/crdts");
 const CausalContext = require("../../src/backend/causal-context");
+const { createAbsolutePositionFromRelativePosition } = require("yjs");
 
 const expect = chai.expect;
 chai.use(dirtyChai);
+
+function shuffle(array) {
+  array.sort(() => Math.random() - 0.5);
+}
 
 describe("test frontend public API ", () => {
   describe("check init and change", () => {
@@ -36,6 +41,87 @@ describe("test frontend public API ", () => {
         doc.a.c = { hi: "bye-3" };
       });
       expect(doc.a.c.hi).to.deep.equal("bye-3");
+    });
+  });
+
+  describe("check single values and all values", () => {
+    it("check init", () => {
+      let doc1 = DCRDT.init({ REPLICA_ID: "R1", DELTAS_CACHE_MODE: COMPRESSED_DELTAS });
+      let doc2 = DCRDT.init({ REPLICA_ID: "R2", DELTAS_CACHE_MODE: COMPRESSED_DELTAS });
+      doc1 = DCRDT.change(doc1, "test", (doc) => {
+        doc.a = [1]
+      });
+      expect(DCRDT.documentValue(doc1)).to.deep.equal({
+        a: [new Set([1])],
+      });
+      let delta = DCRDT.getChanges(doc1);
+      doc2 = DCRDT.applyChanges(doc2, delta);
+      expect(DCRDT.documentValue(doc2)).to.deep.equal({
+        a: [new Set([1])],
+      });
+
+      doc1 = DCRDT.change(doc1, "test", (doc) => {
+        doc.a[0] = 2
+      });
+      expect(DCRDT.documentValue(doc1)).to.deep.equal({
+        a: [new Set([2])],
+      });
+
+      doc2 = DCRDT.change(doc2, "test", (doc) => {
+        doc.a[0] = 3
+      });
+      expect(DCRDT.documentValue(doc2)).to.deep.equal({
+        a: [new Set([3])],
+      });
+      
+      let d1 = DCRDT.getChanges(doc1);
+      let d2 = DCRDT.getChanges(doc2);
+      doc1 = DCRDT.applyChanges(doc1, d2);
+      doc2 = DCRDT.applyChanges(doc2, d1);
+      expect(DCRDT.documentValue(doc2)).to.deep.equal({
+        a: [new Set([2, 3])],
+      });
+
+      let backend = DCRDT.getBackend(doc1);
+
+      doc1 = DCRDT.change(doc1, "test", (doc) => {
+        doc.a = [3,1,2]
+      });
+      doc1 = DCRDT.change(doc1, "test", (doc) => {
+        doc.a.sort()
+      });
+
+      // expect(doc.a.b.hi).to.deep.equal("bye");
+
+      // doc = DCRDT.change(doc, "test", (doc) => {
+      //   doc.a.b = { hi: "bye-2" };
+      // });
+      // expect(doc.a.b.hi).to.deep.equal("bye-2");
+      // doc = DCRDT.change(doc, "test", (doc) => {
+      //   doc.a.c = { hi: "bye-3" };
+      // });
+      // expect(doc.a.c.hi).to.deep.equal("bye-3");
+    });
+    it("check sort", () => {
+      let doc1 = DCRDT.init({ REPLICA_ID: "R1", DELTAS_CACHE_MODE: COMPRESSED_DELTAS });
+      for (let _ = 0; _ < 3; _++) {
+        let length = 10;
+        let arr = [...Array(length).keys()]
+        shuffle(arr)
+        doc1 = DCRDT.change(doc1, "test", (doc) => {
+          doc.a = arr
+        });
+        // console.log(DCRDT.documentValue(doc1).a)
+        doc1 = DCRDT.change(doc1, "test", (doc) => {
+          doc.a.sort()
+        });
+        let unshuffled = []
+        for (let index = 0; index < length; index++) {
+          unshuffled[index] = new Set([index])
+        }
+
+        expect(DCRDT.documentValue(doc1).a).to.deep.equal(unshuffled)
+      }
     });
   });
 

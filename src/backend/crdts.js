@@ -259,7 +259,16 @@ class ORArray {
     return retArray[idx];
   }
 
-  static value([m, cc]) {
+  static length([m, cc]) {
+    let length = 0
+    for (let [uid, _] of m.state.entries()) {
+      if (uid === ALIVE) continue;
+      length = length + 1
+    }
+    return length
+  }
+
+  static value([m, cc], getAllValues = true) {
     assert(m instanceof DotMap);
     assert(cc instanceof CausalContext);
 
@@ -274,7 +283,11 @@ class ORArray {
       } else if (innerMap.has(ARRAY)) {
         v = ORArray.value([innerMap.get(ARRAY), cc]);
       } else {
-        v = MVReg.values([innerMap.get(VALUE), cc]);
+        if (getAllValues) {
+          v = MVReg.values([innerMap.get(VALUE), cc]);
+        } else {
+          v = MVReg.value([innerMap.get(VALUE), cc]);
+        }
       }
 
       // get position
