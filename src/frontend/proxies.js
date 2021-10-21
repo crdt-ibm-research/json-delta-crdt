@@ -17,7 +17,7 @@ const MVRHandler = {};
  */
 
 const MapHandler = {
-  get(target, key) {
+  get(target, key, ...receiver) {
     let { context, wrappedObject, mutatorsList, isRoot } = target;
     if (isRoot) {
       const [m, cc] = context.doc;
@@ -35,7 +35,7 @@ const MapHandler = {
       mutatorsList.push(function (f) {
         return JsonMap.applyToArray(f, key);
       });
-      return listProxy(context, val, mutatorsList, false);
+      return listProxy(context, val, mutatorsList, false, receiver);
     } else if (type === VALUE) {
       mutatorsList.push(function (f) {
         return JsonMap.applyToValue(f, key);
@@ -98,7 +98,7 @@ const MapHandler = {
 };
 
 const ListHandler = {
-  get(target, prop) {
+  get(target, prop, ...receiver) {
     let { context, wrappedObject, mutatorsList, isRoot } = target;
     const [m, cc] = context.doc;
     if (prop === "sort") {

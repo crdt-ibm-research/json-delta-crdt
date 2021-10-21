@@ -75,7 +75,7 @@ class ORMap {
     }
   }
 
-  static value(target) {
+  static value(target, getAllValues = true) {
     const [m, cc] = target;
     assert(m instanceof DotMap);
 
@@ -85,11 +85,15 @@ class ORMap {
       if (key === ALIVE) continue;
       const innerMap = m.get(key);
       if (innerMap.has(MAP)) {
-        value = ORMap.value([innerMap.get(MAP), cc]);
+        value = ORMap.value([innerMap.get(MAP), cc], getAllValues);
       } else if (innerMap.has(ARRAY)) {
-        value = ORArray.value([innerMap.get(ARRAY), cc]);
+        value = ORArray.value([innerMap.get(ARRAY), cc], getAllValues);
       } else {
-        value = MVReg.values([innerMap.get(VALUE), cc]);
+        if (getAllValues) {
+          value = MVReg.values([innerMap.get(VALUE), cc]);
+        } else {
+          value = MVReg.value([innerMap.get(VALUE), cc]);
+        }
       }
 
       retMap[key] = value;
@@ -279,9 +283,9 @@ class ORArray {
       const innerMap = pair.get(FIRST);
       let v;
       if (innerMap.has(MAP)) {
-        v = ORMap.value([innerMap.get(MAP), cc]);
+        v = ORMap.value([innerMap.get(MAP), cc], getAllValues);
       } else if (innerMap.has(ARRAY)) {
-        v = ORArray.value([innerMap.get(ARRAY), cc]);
+        v = ORArray.value([innerMap.get(ARRAY), cc], getAllValues);
       } else {
         if (getAllValues) {
           v = MVReg.values([innerMap.get(VALUE), cc]);

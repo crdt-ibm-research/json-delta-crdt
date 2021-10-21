@@ -16,8 +16,8 @@ function getBackend(frontend) {
   return frontend[BACKEND];
 }
 
-function documentValue(frontend) {
-  return frontend[BACKEND].getObject();
+function documentValue(frontend, getAllValues = true) {
+  return frontend[BACKEND].getObject(getAllValues);
 }
 
 function createBottomDelta(frontend) {
