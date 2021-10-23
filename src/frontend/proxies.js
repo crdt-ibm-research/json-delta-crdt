@@ -108,7 +108,12 @@ const ListHandler = {
         let length = ORArray.length(orarray)
         let indices = [...Array(length).keys()]
         let values = ORArray.value(orarray, false)
-        let sortedIndices = indices.sort(customSort || ((a,b) => a-b))
+        let sortedIndices
+        if (customSort === undefined) {
+          sortedIndices = indices.sort((i,j) => values[i]-values[j])
+        } else {
+          sortedIndices = indices.sort((i,j) => customSort(values[i],values[j]))
+        }
 
         for (let idx = length - 1; idx >= 0; idx--) {
           // mutatorsList.push(function (f) {
