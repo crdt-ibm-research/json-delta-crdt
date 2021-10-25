@@ -75,7 +75,13 @@ const MapHandler = {
     }
     let delta = mutator(doc);
     delta = DotMap.join(delta, clearDelta);
-    context.delta = delta;
+
+    if (context.delta === undefined) {
+      context.delta = delta;
+    } else {
+      context.delta = DotMap.join(context.delta, delta);
+    }
+    
     context.doc = DotMap.join(doc, delta);
     return true;
   },
@@ -91,7 +97,11 @@ const MapHandler = {
     const doc = context.doc;
     let clearDelta = clearMutator(doc);
 
-    context.delta = clearDelta;
+    if (context.delta === undefined) {
+      context.delta = clearDelta;
+    } else {
+      context.delta = DotMap.join(context.delta, clearDelta);
+    }
     context.doc = DotMap.join(doc, clearDelta);
     return true;
   },
@@ -131,7 +141,11 @@ const ListHandler = {
           }
           const doc = context.doc;
           let delta = mutator(doc);
-          context.delta = delta;
+          if (context.delta === undefined) {
+            context.delta = delta;
+          } else {
+            context.delta = DotMap.join(context.delta, delta);
+          }
           context.doc = DotMap.join(doc, delta);
         }
       }
@@ -216,7 +230,12 @@ const ListHandler = {
     }
     const doc = context.doc;
     let delta = mutator(doc);
-    context.delta = delta;
+    
+    if (context.delta === undefined) {
+      context.delta = delta;
+    } else {
+      context.delta = DotMap.join(context.delta, delta);
+    }
     context.doc = DotMap.join(doc, delta);
     return true;
   },
@@ -232,7 +251,11 @@ const ListHandler = {
     const doc = context.doc;
     let clearDelta = clearMutator(doc);
 
-    context.delta = clearDelta;
+    if (context.delta === undefined) {
+      context.delta = clearDelta;
+    } else {
+      context.delta = DotMap.join(context.delta, clearDelta);
+    }
     context.doc = DotMap.join(doc, clearDelta);
     return true;
   },
