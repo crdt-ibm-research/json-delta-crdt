@@ -75,7 +75,7 @@ class Backend {
     return res;
   }
 
-  getObject(getAllValues = false) {
+  getObject(getAllValues = true) {
     return ORMap.value(this._state, getAllValues);
   }
 
