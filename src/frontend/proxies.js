@@ -111,8 +111,8 @@ const MapHandler = {
 const ListHandler = {
   get(target, prop) {
     let { context, wrappedObject, mutatorsList, isRoot } = target;
-    const [m, cc] = context.doc;
     if (prop === "sort") {
+      const [_, cc] = context.doc;
       return function (customSort) {
         let orarray = [wrappedObject, cc]
         let length = ORArray.length(orarray)
@@ -149,34 +149,13 @@ const ListHandler = {
           context.doc = DotMap.join(doc, delta);
         }
       }
-
-      // for (let i = mutatorsList.length - 1; i >= 0; i--) {
-      //   mutator = mutatorsList[i](mutator);
-      // }
-      // const doc = context.doc;
-      // let delta = mutator(doc);
-      // context.delta = delta;
-      // context.doc = DotMap.join(doc, delta);
-      
-      let ormap = ORMap.value(context.doc)
-
-      return values.sort
-    }
-
-    if (prop === "length") {
-      let orarray = [wrappedObject, cc]
-      return ORArray.length(orarray)
-    }
-
-    let idx = parseInt(prop)
-    if (! isNaN(idx)) {
-      return ORArray.value([wrappedObject, cc], false)[idx]
     }
     if (isRoot) {
+      const [m, cc] = context.doc;
       wrappedObject = m;
       mutatorsList = new Array();
     }
-    let [val, type] = ORArray.value(context);
+    let [val, type] = ORArray.getIdx(wrappedObject, prop);
     if (type === MAP) {
       mutatorsList.push(function (f) {
         return JsonArray.applyToMap(f, prop);
@@ -230,12 +209,7 @@ const ListHandler = {
     }
     const doc = context.doc;
     let delta = mutator(doc);
-    
-    if (context.delta === undefined) {
-      context.delta = delta;
-    } else {
-      context.delta = DotMap.join(context.delta, delta);
-    }
+    context.delta = delta;
     context.doc = DotMap.join(doc, delta);
     return true;
   },
@@ -251,11 +225,7 @@ const ListHandler = {
     const doc = context.doc;
     let clearDelta = clearMutator(doc);
 
-    if (context.delta === undefined) {
-      context.delta = clearDelta;
-    } else {
-      context.delta = DotMap.join(context.delta, clearDelta);
-    }
+    context.delta = clearDelta;
     context.doc = DotMap.join(doc, clearDelta);
     return true;
   },
