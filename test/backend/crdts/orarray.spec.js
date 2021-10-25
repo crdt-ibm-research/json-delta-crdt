@@ -65,14 +65,14 @@ describe("orarray", () => {
       const writeA = function ([m, cc]) {
         return MVReg.write("a", [m, cc]);
       };
-      let p = new Position([[55, "r1"]]);
+      let p = new Position(55);
       const d1 = ORArray.insertValue("a", writeA, p, orarray);
       orarray = DotMap.join(orarray, d1);
 
       const writeB = function ([m, cc]) {
         return MVReg.write("b", [m, cc]);
       };
-      p = new Position([[80, "r1"]]);
+      p = new Position(80);
       const d2 = ORArray.insertValue("b", writeB, p, orarray);
       orarray = DotMap.join(orarray, d2);
 
@@ -81,7 +81,7 @@ describe("orarray", () => {
         new Set(["b"]),
       ]);
 
-      p = new Position([[150, "r1"]]);
+      p = new Position(150);
       const d3 = ORArray.move("a", p, orarray);
       orarray = DotMap.join(orarray, d3);
 
