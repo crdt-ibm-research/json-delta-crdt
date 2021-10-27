@@ -28,6 +28,7 @@ function yjsTest(doc1, n) {
   for (i = 0; i < n; i++) {
     yarray.delete(0, 1);
     let arr = new Y.Array();
+    arr.insert(0,[1])
     yarray.insert(0, [arr]);
   }
   return doc1;
