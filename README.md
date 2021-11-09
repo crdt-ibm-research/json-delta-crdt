@@ -4,9 +4,18 @@ Prototype implementation of delta based CRDTs supporting JSON data using Javascr
 
 The code for generating the figures is located under:
 
-- [`benchmarks`](benchmarks) - contains the code for figures 9 - 14
+- [`benchmarks`](benchmarks) - contains the code for figures 3, 4, and 5
 
-- [`cpp-src`](cpp-src) - contains the code for figures 15 and 16
+
+# Running tests
+
+After cloning the repository, first execute:
+`npm init`
+
+The tests can be run via a python script:
+`python run_test.py -fig FIG`
+
+Where `FIG` is either 3a,3b,...,3f,4 or 5.
 
 # Disclaimer
 
