@@ -24,4 +24,8 @@ function jysTest(doc1, n) {
   return doc1;
 }
 
-runTest(mapTest, jysTest);
+// let sizes = [1,  2,  4,  8,  16,  32,  64,  128,  256,  512,  1024,  2048,  4096,  8192,  16384,  32768,
+//   65536,  131072,  262144]
+ let sizes = [1,  2,  4,  8,  16,  32,  64,  128,  256,  512,  1024,  2048,  4096,  8192,  16384,  32768]
+
+runTest(mapTest, jysTest, sizes);

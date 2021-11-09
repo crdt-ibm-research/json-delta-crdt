@@ -21,7 +21,7 @@ function syncAll(docs) {
     return docs
 }
 
-let maxDocs = 50
+let maxDocs = 30
 
 for (let nDocs = 1; nDocs <= maxDocs; nDocs++) {
 
@@ -66,5 +66,5 @@ for (let nDocs = 1; nDocs <= maxDocs; nDocs++) {
     const encoded = Encoder.encodeFrontend(docs[0]);
     let docDeltaInspection = encoded.byteLength;
 
-    console.log(`${nDocs}, ${docDeltaInspection}`)
+    console.log(`${nDocs},${docDeltaInspection}`)
 }

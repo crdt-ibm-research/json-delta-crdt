@@ -96,7 +96,7 @@ updateProbs.forEach(probUpdate => {
 
         // const average = (array) => array.reduce((a, b) => a + b) / array.length;
         // console.log(`${probUpdate}, ${probSync}, ${average(sizes)}`)
-        console.log(`${probUpdate}, ${probSync}, ${sizes.join(', ')}`)
+        console.log(`${probUpdate},${probSync},${sizes.join(', ')}`)
         sizes.join(', ');
     });
 });
